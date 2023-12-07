@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <title>Corematch</title>
+    <link rel="stylesheet" href="/index.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+  </head>
+  <body>
+    <h1>Corematch</h1>
+    
+    <script type="module">
+      import init, { init_app } from "./pkg/corematch.js";
+      var element = document.getElementById("app");
+      init().then(() => {
+        try {
+          init_app(element);
+        } catch (e) {
+          console.error(e);
+        }
+      });
+    </script>
+
+    <div id="app" />
+
+  </body>
+</html>

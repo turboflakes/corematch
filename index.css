@@ -1,0 +1,105 @@
+html {
+  /* background: hsla(186, 33%, 94%, 1);
+  background: linear-gradient(180deg, hsla(186, 33%, 94%, 1) 0%, hsla(216, 41%, 79%, 1) 100%);
+  background: -moz-linear-gradient(180deg, hsla(186, 33%, 94%, 1) 0%, hsla(216, 41%, 79%, 1) 100%);
+  background: -webkit-linear-gradient(180deg, hsla(186, 33%, 94%, 1) 0%, hsla(216, 41%, 79%, 1) 100%); */
+}
+
+body {
+  color: #0B1317;
+}
+
+@font-face {
+  font-family: 'Gilroy';
+  src: local('Gilroy Extrabold'), local('Gilroy-Extrabold'),
+      url('https://raw.githubusercontent.com/turboflakes/ref-275/main/assets/fonts/Gilroy/Gilroy-Extrabold.woff2') format('woff2'),
+      url('https://raw.githubusercontent.com/turboflakes/ref-275/main/assets/fonts/Gilroy/Gilroy-Extrabold.woff') format('woff'),
+      url('https://raw.githubusercontent.com/turboflakes/ref-275/main/assets/fonts/Gilroy/Gilroy-Extrabold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+}
+
+.boardtime {
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  width: calc(4 * (4px + (8 * 10 * 1px)));
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+.corespace {
+  margin: 2px;
+  padding: 2px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 1px;
+  aspect-ratio: 1;
+  inline-size: calc(8 * 10 * 1px);
+  block-size: calc(8 * 10 * 1px);
+  border: 2px solid rgb(0 0 0 / 0.06);
+  border-radius: calc(6 * 0.65 * 1px);
+}
+
+.corespace:hover {
+  cursor: pointer;
+  border: 2px solid rgb(0 0 0 / 0.24);
+}
+
+.corespace:last-child {
+  margin-right: auto;
+  margin-bottom: auto;
+}
+
+.corespace-head {
+  border: 2px solid rgb(0 0 0 / 1);
+}
+
+.game-on {
+  border-color: #44D7B6;
+}
+
+.corespace-match {
+  
+}
+
+.help-on {
+  border-color: #FA6400;
+  animation: headShake;
+  animation-duration: 1s;
+}
+
+.corespace-head:hover {
+  cursor: default;
+  border: 2px solid rgb(0 0 0 / 1);
+}
+
+.corespace-head-on:hover {
+  cursor: default;
+  border: 2px solid #44D7B6;
+}
+
+.core {
+  contain: strict;
+  aspect-ratio: 1;
+  inline-size: 8px;
+  block-size: 8px;
+  border: 1px solid rgb(0 0 0 / 0.06);
+  border-radius: calc(6 * 0.15 * 1px);
+  /* will-change: transform; */
+}
+
+.core:last-child {
+  margin-bottom: auto;
+}
+
+.core--0 { 
+  background-color: #EBEDF0;
+}
+
+.core--1 { 
+  background-color: #628BF9;
+}
