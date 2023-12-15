@@ -1,4 +1,5 @@
-use crate::Corespace;
+use crate::block::{Block, Corespace};
+use crate::core::Core;
 use futures::StreamExt;
 use log::error;
 use node_runtime::runtime_types::{
@@ -11,7 +12,7 @@ use yew::{
     AttrValue, Callback,
 };
 
-use crate::components::subscription_provider::STOP_SIGNAL;
+use crate::subscription_provider::STOP_SIGNAL;
 
 #[subxt::subxt(
     runtime_metadata_path = "metadata/kusama_metadata.scale",
@@ -24,7 +25,7 @@ const SIX_SECS: Duration = Duration::from_secs(6);
 /// subscribes to finalized blocks, when a block is received, fetch storage for the block hash and send it via the callback.
 pub async fn subscribe_to_finalized_blocks(
     api: OnlineClient<PolkadotConfig>,
-    cb: Callback<Corespace>,
+    cb: Callback<Block>,
 ) -> Result<UnboundedSender<AttrValue>, subxt::Error> {
     // Create channel so that an unsubscribe signal could be received.
     let (tx, mut rx) = yew::platform::pinned::mpsc::unbounded::<AttrValue>();
@@ -58,17 +59,21 @@ pub async fn subscribe_to_finalized_blocks(
                                     if let Some(availability_cores) = availability_cores_option {
                                         let corespace = availability_cores
                                             .iter()
-                                            .map(|core_occupied| match core_occupied {
-                                                CoreOccupied::Free => None,
+                                            .enumerate()
+                                            .map(|(i, core_occupied)| match core_occupied {
+                                                CoreOccupied::Free => Core::new(i, None),
                                                 CoreOccupied::Paras(paras_entry) => {
                                                     let Id(para_id) =
                                                         paras_entry.assignment.para_id;
-                                                    Some(format!("{0}", para_id).into())
+                                                    Core::new(i, Some(para_id))
                                                 }
                                             })
                                             .collect::<Corespace>();
 
-                                        cb.emit(corespace);
+                                        cb.emit(Block::new(
+                                            block.number().clone(),
+                                            corespace.clone(),
+                                        ));
                                     }
                                 }
                                 Err(e) => error!("{}", e),

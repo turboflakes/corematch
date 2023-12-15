@@ -1,7 +1,6 @@
 use yew::AttrValue;
 
 pub type ChainPrefix = u16;
-pub type ChainTokenSymbol = String;
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub enum SupportedRuntime {

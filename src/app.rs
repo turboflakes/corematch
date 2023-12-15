@@ -1,43 +1,47 @@
-use log::info;
+use log::{debug, info};
 use std::collections::BTreeMap;
 use std::rc::Rc;
+use subxt::utils::H256;
 use yew::{
-    classes, function_component, html, AttrValue, Callback, Component, Context, ContextProvider,
-    Html, Properties,
+    classes, function_component, html, html::Scope, AttrValue, Callback, Component, Context,
+    ContextProvider, Html, Properties,
 };
 
-use crate::components::{
-    network_button::NetworkButton, subscription_provider::SubscriptionProvider,
-};
+use crate::block::{Block, BlockNumber, BlockView, Corespace};
+use crate::buttons::{BlockViewButton, HelpButton, NetworkButton, StartButton};
+use crate::core::{Core, CoreView};
 use crate::runtimes::support::SupportedRuntime;
+use crate::subscription_provider::SubscriptionProvider;
 use crate::NetworkState;
 
-
-pub type ParaId = AttrValue;
-pub type Corespace = Vec<Option<ParaId>>;
-
 pub enum Msg {
-    NetworkDataReceived(Corespace),
+    NetworkDataReceived(Block),
     NetworkButtonClicked(AttrValue),
-    // CorespaceClicked(usize),
-    // StartButtonClicked,
-    // HelpButtonClicked,
-    // StopButtonClicked,
-    // GameFinished,
+    BlockClicked(usize),
+    BlockMatched,
+    BlockAnimationEnded(BlockNumber),
+    StartButtonClicked,
+    HelpButtonClicked,
+    GameFinished,
+    BlockViewClicked(BlockView),
 }
+
+type Index = usize;
 
 pub struct App {
     network_state: Rc<NetworkState>,
-    data: Vec<Option<Corespace>>,
-    // match_key: Option<String>,
-    // matches: BTreeMap<String, u32>,
-    // duration: u32,
-    // points: u32,
-    // tries: u32,
-    // is_game_on: bool,
-    // is_help_on: bool,
-    // is_help_disabled: bool,
-    // help_duration: u32,
+    blocks: Vec<Option<Block>>,
+    block_view: BlockView,
+    core_view: CoreView,
+    match_block: Option<Block>,
+    matches: BTreeMap<H256, u32>,
+    duration: u32,
+    points: u32,
+    tries: u32,
+    is_game_on: bool,
+    is_help_on: bool,
+    is_help_disabled: bool,
+    help_duration: u32,
 }
 
 impl Component for App {
@@ -53,20 +57,173 @@ impl Component for App {
             runtime: runtime.clone(),
             runtime_callback,
         });
-        
+
         Self {
             network_state,
-            data: vec![None; 16],
+            blocks: vec![None; 16],
+            block_view: BlockView::Cores,
+            core_view: CoreView::Binary,
+            match_block: None,
+            matches: BTreeMap::new(),
+            duration: 0,
+            points: 0,
+            tries: 6,
+            is_game_on: false,
+            is_help_on: false,
+            is_help_disabled: false,
+            help_duration: 16,
         }
     }
-    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            Msg::NetworkDataReceived(data) => {
-                info!("NetworkDataReceived: {:?}", data);
-            }
             Msg::NetworkButtonClicked(network) => {
                 let network_state = Rc::make_mut(&mut self.network_state);
                 network_state.runtime = SupportedRuntime::from(network);
+            }
+            Msg::NetworkDataReceived(block) => {
+                self.blocks.insert(0, Some(block.clone()));
+                let hash = block.corespace_hash(self.core_view.clone());
+                // add counter for key
+                self.matches
+                    .entry(hash)
+                    .and_modify(|m| *m += 1)
+                    .or_insert(1);
+                // remove oldest corespace
+                if self.blocks.len() > 16 {
+                    if let Some(opt) = self.blocks.pop() {
+                        if let Some(block) = opt {
+                            let hash = block.corespace_hash(self.core_view.clone());
+                            // subtract counter from hash
+                            self.matches.entry(hash.clone()).and_modify(|m| *m -= 1);
+                            // remove if counter is zero
+                            if let Some(counter) = self.matches.get(&hash) {
+                                if *counter == 0 {
+                                    self.matches.remove(&hash);
+                                }
+                            }
+                            // set match block to node in case is the one being expired
+                            if let Some(match_block) = &self.match_block {
+                                if match_block.corespace_hash(self.core_view.clone()) == hash {
+                                    self.match_block = None;
+                                }
+                            }
+                        }
+                    }
+                }
+                debug!("_matches {:?}", self.matches);
+                // update game stats if game is on
+                self.incr_duration();
+                // highlight matches if help is on
+                if self.is_help_on {
+                    let matches: Vec<_> = Vec::from_iter(self.matches.iter())
+                        .iter()
+                        .filter(|(_, counter)| **counter > 1)
+                        .map(|(hash, _)| **hash)
+                        .collect();
+
+                    for hash in matches.iter() {
+                        for opt in self.blocks.iter_mut() {
+                            if let Some(block) = opt {
+                                if *hash == block.corespace_hash(self.core_view.clone()) {
+                                    info!("HELP");
+                                    if block.is_help_available() {
+                                        block.help();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            Msg::BlockClicked(i) => {
+                if self.is_game_on {
+                    if let Some(opt) = self.blocks.get_mut(i) {
+                        if let Some(block) = opt {
+                            if block.is_matched() {
+                                return false;
+                            }
+                            if let Some(match_block) = &self.match_block {
+                                let corespace_hash = block.corespace_hash(self.core_view.clone());
+                                if match_block.block_number == block.block_number {
+                                    block.clicked();
+                                    self.match_block = None;
+                                } else if match_block.corespace_hash(self.core_view.clone())
+                                    == corespace_hash
+                                {
+                                    info!("Congrats, you found a match!");
+                                    // increase points and update corespace by an empty space
+                                    block.matched();
+                                    self.match_succeed();
+                                    ctx.link().send_message(Msg::BlockMatched);
+                                } else {
+                                    block.missed();
+                                    self.match_failed();
+                                }
+                            } else {
+                                block.clicked();
+                                self.match_block = Some(block.clone());
+                            }
+                        }
+                    }
+                }
+            }
+            Msg::BlockMatched => {
+                // lookout for current index of the matched block
+                if let Some(match_block) = &self.match_block {
+                    if let Some(i) = self.blocks.iter().position(|opt| {
+                        opt.clone().unwrap().block_number == match_block.block_number
+                    }) {
+                        if let Some(opt) = self.blocks.get_mut(i) {
+                            if let Some(block) = opt {
+                                self.match_block = None;
+                                block.matched();
+                            }
+                        }
+                    }
+                }
+            }
+            Msg::BlockAnimationEnded(block_number) => {
+                if let Some(i) = self
+                    .blocks
+                    .iter()
+                    .position(|opt| opt.clone().unwrap().block_number == block_number)
+                {
+                    if let Some(block_option) = self.blocks.get_mut(i) {
+                        if let Some(block) = block_option {
+                            block.reset_class();
+                        }
+                    }
+                }
+            }
+            Msg::StartButtonClicked => {
+                self.start();
+            }
+            Msg::HelpButtonClicked => {
+                self.start_help();
+            }
+            Msg::GameFinished => {
+                info!("GameFinished");
+                // reset the current selected match block
+                if let Some(match_block) = &self.match_block {
+                    if let Some(i) = self.blocks.iter().position(|opt| {
+                        opt.clone().unwrap().block_number == match_block.block_number
+                    }) {
+                        if let Some(opt) = self.blocks.get_mut(i) {
+                            if let Some(block) = opt {
+                                self.match_block = None;
+                                block.clicked();
+                            }
+                        }
+                    }
+                }
+                // reset game counters
+                self.reset();
+                // show view to share results and restart the game
+                // TODO
+            }
+            Msg::BlockViewClicked(view) => {
+                self.block_view = view;
             }
         }
         true
@@ -87,8 +244,188 @@ impl Component for App {
                     }}
                 </SubscriptionProvider>
 
-                <div>{ "network_state" }</div>
+                if self.blocks.is_empty() {
+                    <p>{"Loading..."}</p>
+                }
+                else { { self.game_view(ctx.link()) } }
+
             </ContextProvider<Rc<NetworkState>>>
+        }
+    }
+}
+
+impl App {
+    fn game_view(&self, link: &Scope<Self>) -> Html {
+        html! {
+        <div class="content">
+            <div class="content-header">
+            { self.head_block_view_options_view(link) }
+            { self.head_game_panel_view(link) }
+            </div>
+            <div class="content-body">
+                <div class="board">
+                    { for self.blocks.iter().enumerate().map(|(i, block_option)| {
+                            if let Some(block) = block_option {
+                                let block_clicked = link.callback(move |_| Msg::BlockClicked(i.clone()));
+                                let block_animation_ended = link.callback(move |bn| Msg::BlockAnimationEnded(bn));
+                                block.render(self.block_view.clone(), self.core_view.clone(), block_clicked.clone(), block_animation_ended.clone())
+                            } else {
+                                html! { <div class="corespace empty"></div> }
+                            }
+                        })
+                    }
+                </div>
+            </div>
+        </div>
+        }
+    }
+
+    fn head_block_view_options_view(&self, link: &Scope<Self>) -> Html {
+        let option_click = link.callback(move |e| Msg::BlockViewClicked(e));
+        html! {
+            <div class="block-view-options">
+                <BlockViewButton view={BlockView::Cores}
+                    selected={self.block_view == BlockView::Cores}
+                    onclick={option_click.clone()} />
+                <BlockViewButton view={BlockView::Palette}
+                    selected={self.block_view == BlockView::Palette}
+                    onclick={option_click.clone()} />
+            </div>
+        }
+    }
+
+    fn head_game_panel_view(&self, link: &Scope<Self>) -> Html {
+        html! {
+            <div class="game-panel">
+                { self.head_game_stats_view() }
+                { self.head_game_controls_view(link) }
+            </div>
+        }
+    }
+
+    fn head_game_controls_view(&self, link: &Scope<Self>) -> Html {
+        let start_onclick = link.callback(move |_| Msg::StartButtonClicked);
+        let help_onclick = link.callback(move |_| Msg::HelpButtonClicked);
+        html! {
+            <div class="game-controls">
+                { self.is_game_on_view()}
+                <StartButton is_game_on={self.is_game_on} onclick={start_onclick} />
+                <HelpButton is_game_on={self.is_game_on} is_help_on={self.is_help_on}
+                    duration={self.help_duration} onclick={help_onclick} />
+            </div>
+        }
+    }
+
+    fn is_game_on_view(&self) -> Html {
+        html! {
+            if self.is_game_on {
+                <div class="game-on">{"GAME ON!"}</div>
+            } else { }
+        }
+    }
+
+    fn head_game_stats_view(&self) -> Html {
+		let help_class = if self.is_help_on {
+			Some("help-on")
+		} else {
+			None
+		};
+
+        html! {
+            <table class="game-stats">
+                <tr>
+                    <th>{"Points"}</th>
+                    <th>{"Duration"}</th>
+                    <th>{"Tries"}</th>
+                    <th>{"Helps"}</th>
+                </tr>
+                <tr>
+                    <td>{self.points}</td>
+                    <td>{self.duration}</td>
+                    <td>{self.tries}</td>
+                    <td class={classes!(help_class)}>{self.help_duration}</td>
+                </tr>
+            </table>
+        }
+    }
+
+    fn full_reset(&mut self) {
+        self.reset();
+        self.blocks = Vec::with_capacity(16);
+        self.match_block = None;
+        self.matches = BTreeMap::new();
+    }
+
+    fn reset(&mut self) {
+        self.duration = 0;
+        self.points = 0;
+        self.tries = 6;
+        self.is_game_on = false;
+        self.is_help_on = false;
+        self.is_help_disabled = false;
+        self.help_duration = 16;
+    }
+
+    fn start(&mut self) {
+        self.reset();
+        self.is_game_on = true;
+    }
+
+    fn stop(&mut self) {
+        self.is_game_on = false;
+    }
+
+    fn match_succeed(&mut self) {
+        if self.is_game_on {
+            self.incr_points();
+        }
+    }
+
+    fn match_failed(&mut self) {
+        if self.is_game_on {
+            self.decr_tries();
+        }
+    }
+
+    fn incr_points(&mut self) {
+        if self.is_game_on {
+            self.points += 20;
+        }
+    }
+
+    fn incr_duration(&mut self) {
+        if self.is_game_on {
+            self.duration += 1;
+            if self.is_help_on {
+                self.decr_help_duration();
+            }
+        }
+    }
+
+    fn decr_tries(&mut self) {
+        if self.is_game_on && self.tries > 0 {
+            self.tries -= 1;
+            // terminate game when no tries left to be played
+            if self.tries == 0 {
+                self.is_game_on = false;
+            }
+        }
+    }
+
+    fn start_help(&mut self) {
+        if self.is_game_on && !self.is_help_disabled {
+            self.is_help_on = true;
+        }
+    }
+
+    fn decr_help_duration(&mut self) {
+        if self.is_help_on && self.help_duration > 0 {
+            self.help_duration -= 1;
+            // terminate game when no tries left to be played
+            if self.help_duration == 0 {
+                self.is_help_on = false;
+                self.is_help_disabled = true;
+            }
         }
     }
 }

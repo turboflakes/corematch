@@ -1,9 +1,9 @@
-use crate::Corespace;
+use crate::block::{Block, Corespace};
 use crate::NetworkState;
 use crate::SupportedRuntime;
 use anyhow::anyhow;
 use futures::FutureExt;
-use log::error;
+use log::{error, info};
 use std::rc::Rc;
 use subxt::{OnlineClient, PolkadotConfig};
 use yew::{
@@ -11,7 +11,7 @@ use yew::{
     Context, ContextHandle, Html, Properties,
 };
 
-use crate::runtimes::{kusama, polkadot};
+use crate::runtimes::polkadot;
 
 pub const STOP_SIGNAL: &str = "stop";
 pub const CONTINUE_SIGNAL: &str = "continue";
@@ -19,7 +19,7 @@ pub const CONTINUE_SIGNAL: &str = "continue";
 pub enum Msg {
     Error(anyhow::Error),
     OnlineClientCreated(OnlineClient<PolkadotConfig>),
-    OnlineClientDataReceived(Corespace),
+    OnlineClientDataReceived(Block),
     SubscriptionChannelCreated(UnboundedSender<AttrValue>),
     ContextChanged(Rc<NetworkState>),
 }
@@ -74,7 +74,7 @@ impl Component for SubscriptionProvider {
             }
             Msg::OnlineClientCreated(online_client) => {
                 self.online_client = Some(online_client);
-                let cb: Callback<Corespace> = ctx.link().callback(Msg::OnlineClientDataReceived);
+                let cb: Callback<Block> = ctx.link().callback(Msg::OnlineClientDataReceived);
                 let api = self.online_client.as_ref().unwrap().clone();
 
                 match self.state.runtime {
@@ -88,17 +88,18 @@ impl Component for SubscriptionProvider {
                             },
                         ),
                     ),
-                    SupportedRuntime::Kusama => {
-                        ctx.link()
-                            .send_future(kusama::subscribe_to_finalized_blocks(api, cb).map(
-                                |result| match result {
-                                    Ok(subscription_channel) => {
-                                        Msg::SubscriptionChannelCreated(subscription_channel)
-                                    }
-                                    Err(err) => Msg::Error(err.into()),
-                                },
-                            ))
-                    }
+                    // SupportedRuntime::Kusama => {
+                    //     ctx.link()
+                    //         .send_future(kusama::subscribe_to_finalized_blocks(api, cb).map(
+                    //             |result| match result {
+                    //                 Ok(subscription_channel) => {
+                    //                     Msg::SubscriptionChannelCreated(subscription_channel)
+                    //                 }
+                    //                 Err(err) => Msg::Error(err.into()),
+                    //             },
+                    //         ))
+                    // }
+                    _ => unimplemented!(),
                 };
                 true
             }
@@ -113,17 +114,20 @@ impl Component for SubscriptionProvider {
 
                 true
             }
-            Msg::OnlineClientDataReceived(corespace) => {
-                self.state.runtime_callback.emit(corespace);
-
+            Msg::OnlineClientDataReceived(block) => {
                 if let Some(subscription_channel) = &self.subscription_channel {
                     subscription_channel
                         .send_now(CONTINUE_SIGNAL.into())
                         .expect("failed to send signal");
                 }
+
+                // send block to be processed by the app
+                self.state.runtime_callback.emit(block);
+
                 true
             }
             Msg::ContextChanged(state) => {
+                info!("ContextChanged");
                 if state.runtime != self.state.runtime {
                     // Send a signal to the subscription task to drop subscription.
                     if let Some(subscription_channel) = &self.subscription_channel {
