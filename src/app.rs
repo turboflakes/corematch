@@ -230,19 +230,8 @@ impl Component for App {
     }
     fn view(&self, ctx: &Context<Self>) -> Html {
         let network_state = self.network_state.clone();
-        let network_onclick = ctx.link().callback(move |e| Msg::NetworkButtonClicked(e));
         html! {
             <ContextProvider<Rc<NetworkState>> context={ network_state.clone() }>
-                <SubscriptionProvider>
-                    { match network_state.runtime {
-                        SupportedRuntime::Polkadot => html! {
-                            <NetworkButton network="kusama" onclick={network_onclick.clone()} />
-                        },
-                        SupportedRuntime::Kusama => html! {
-                            <NetworkButton network="polkadot" onclick={network_onclick.clone()} />
-                        }
-                    }}
-                </SubscriptionProvider>
 
                 if self.blocks.is_empty() {
                     <p>{"Loading..."}</p>
@@ -257,30 +246,40 @@ impl Component for App {
 impl App {
     fn game_view(&self, link: &Scope<Self>) -> Html {
         html! {
-        <div class="content">
-            <div class="content-header">
-            { self.head_block_view_options_view(link) }
-            { self.head_game_panel_view(link) }
-            </div>
-            <div class="content-body">
-                <div class="board">
-                    { for self.blocks.iter().enumerate().map(|(i, block_option)| {
-                            if let Some(block) = block_option {
-                                let block_clicked = link.callback(move |_| Msg::BlockClicked(i.clone()));
-                                let block_animation_ended = link.callback(move |bn| Msg::BlockAnimationEnded(bn));
-                                block.render(self.block_view.clone(), self.core_view.clone(), block_clicked.clone(), block_animation_ended.clone())
-                            } else {
-                                html! { <div class="corespace empty"></div> }
+            <>
+                <div class="content">
+                    <div class="content-header">
+						<a class="logo-img" href="https://polkadot.network" target="_blank">
+							<img class="icon-img" src="/assets/Polkadot_Logo_Horizontal_Pink-Black.svg" alt="polkadot logo" />
+						</a>
+                        { self.game_stats_view() }
+                    </div>
+                    <div class="content-menu">
+                        { self.head_menu_left_view(link) }
+                        { self.head_menu_right_view(link) }
+                    </div>
+                    <div class="content-body">
+                        { self.game_controls_right_view(link) }
+                        <div class="board">
+                            { for self.blocks.iter().enumerate().map(|(i, block_option)| {
+                                    if let Some(block) = block_option {
+                                        let block_clicked = link.callback(move |_| Msg::BlockClicked(i.clone()));
+                                        let block_animation_ended = link.callback(move |bn| Msg::BlockAnimationEnded(bn));
+                                        block.render(self.block_view.clone(), self.core_view.clone(), block_clicked.clone(), block_animation_ended.clone())
+                                    } else {
+                                        html! { <div class="corespace empty"></div> }
+                                    }
+                                })
                             }
-                        })
-                    }
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
+                { self.footer_view() }
+            </>
         }
     }
 
-    fn head_block_view_options_view(&self, link: &Scope<Self>) -> Html {
+    fn head_menu_left_view(&self, link: &Scope<Self>) -> Html {
         let option_click = link.callback(move |e| Msg::BlockViewClicked(e));
         html! {
             <div class="block-view-options">
@@ -294,21 +293,28 @@ impl App {
         }
     }
 
-    fn head_game_panel_view(&self, link: &Scope<Self>) -> Html {
+    fn head_menu_right_view(&self, link: &Scope<Self>) -> Html {
+        let network_state = self.network_state.clone();
+        let network_onclick = link.callback(move |e| Msg::NetworkButtonClicked(e));
         html! {
-            <div class="game-panel">
-                { self.head_game_stats_view() }
-                { self.head_game_controls_view(link) }
-            </div>
+            <SubscriptionProvider>
+                { match network_state.runtime {
+                    SupportedRuntime::Polkadot => html! {
+                        <NetworkButton switch_to="kusama" onclick={network_onclick.clone()} />
+                    },
+                    SupportedRuntime::Kusama => html! {
+                        <NetworkButton switch_to="polkadot" onclick={network_onclick.clone()} />
+                    }
+                }}
+            </SubscriptionProvider>
         }
     }
 
-    fn head_game_controls_view(&self, link: &Scope<Self>) -> Html {
+    fn game_controls_right_view(&self, link: &Scope<Self>) -> Html {
         let start_onclick = link.callback(move |_| Msg::StartButtonClicked);
         let help_onclick = link.callback(move |_| Msg::HelpButtonClicked);
         html! {
-            <div class="game-controls">
-                { self.is_game_on_view()}
+            <div class="game-controls-right">
                 <StartButton is_game_on={self.is_game_on} onclick={start_onclick} />
                 <HelpButton is_game_on={self.is_game_on} is_help_on={self.is_help_on}
                     duration={self.help_duration} onclick={help_onclick} />
@@ -324,28 +330,49 @@ impl App {
         }
     }
 
-    fn head_game_stats_view(&self) -> Html {
-		let help_class = if self.is_help_on {
-			Some("help-on")
-		} else {
-			None
-		};
+    fn game_stats_view(&self) -> Html {
+        let help_class = if self.is_help_on {
+            Some("help-on")
+        } else {
+            None
+        };
 
         html! {
             <table class="game-stats">
                 <tr>
-                    <th>{"Points"}</th>
+					{ if self.is_game_on { html! { <th></th> } } else { html! {} } }
                     <th>{"Duration"}</th>
                     <th>{"Tries"}</th>
                     <th>{"Helps"}</th>
+                    <th>{"Points"}</th>
                 </tr>
                 <tr>
-                    <td>{self.points}</td>
+					{ if self.is_game_on { html! { <td class="game-on">{"It's ON!"}</td> } } else { html! {} } }
                     <td>{self.duration}</td>
                     <td>{self.tries}</td>
                     <td class={classes!(help_class)}>{self.help_duration}</td>
+                    <td class="points">{self.points}</td>
                 </tr>
             </table>
+        }
+    }
+
+    fn footer_view(&self) -> Html {
+        html! {
+            <footer class="footer">
+                <div class="footer-content">
+                    <a class="logo" href="https://turboflakes.io" target="_blank">
+                        <img class="icon-img" src="/assets/logo_mark_black_subtract_turboflakes_.svg" alt="turboflakes logo" />
+                    </a>
+                    <span>{"Built by TurboFlakes © 2023 // Unstoppable by Polkadot"}</span>
+                </div>
+
+                <div class="footer-content">
+                    <a class="logo" href="https://github.com/turboflakes/corematch" target="_blank">
+                        <img class="icon-img" src="/assets/github.svg" alt="github logo" />
+                    </a>
+                </div>
+            </footer>
         }
     }
 

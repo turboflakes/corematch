@@ -335,7 +335,7 @@ td:last-child {
   padding-right: 0; }
 
 tr {
-  border-bottom: 2px solid rgb(230 234 246 / 1);
+  border-bottom: 2px solid rgb(0 0 0 / 0.8);
 }
 tr:last-child {
   border-bottom: 0;

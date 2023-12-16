@@ -4,7 +4,7 @@ version = "0.1.0"
 license = "Apache-2.0"
 repository = "https://github.com/turboflakes/corematch"
 authors = ["Paulo <paulo@turboflakes.io>"]
-description = "Corematch is a memory game where the player has to match the latest Polkadot cores usage in a 4x4 matrix."
+description = "Corematch is a memory game where the player has to match the latest Polkadot core usage in a 4x4 matrix."
 edition = "2021"
 
 [lib]

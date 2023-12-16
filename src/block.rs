@@ -28,8 +28,8 @@ pub enum BlockView {
 impl std::fmt::Display for BlockView {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Cores => write!(f, "cores usage"),
-            Self::Palette => write!(f, "color palette"),
+            Self::Cores => write!(f, "core usage"),
+            Self::Palette => write!(f, "block palette"),
         }
     }
 }

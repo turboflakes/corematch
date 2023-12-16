@@ -1,4 +1,5 @@
 use crate::block::BlockView;
+use crate::runtimes::support::SupportedRuntime;
 use yew::{classes, function_component, html, AttrValue, Callback, Html, Properties};
 
 #[derive(Properties, PartialEq)]
@@ -14,7 +15,7 @@ pub fn button(props: &StartButtonProps) -> Html {
     html! {
         <div class={classes!("control")}>
             if !props.is_game_on {
-                <div class={classes!("btn-link")} {onclick} >{"start | ►"}</div>
+                <div class={classes!("btn-link")} {onclick} >{"► ❘ start"}</div>
             }
         </div>
     }
@@ -35,7 +36,7 @@ pub fn button(props: &HelpButtonProps) -> Html {
     html! {
         <div class={classes!("control")}>
             if props.is_game_on && !props.is_help_on && props.duration > 0{
-                <div class={classes!("btn-link")} {onclick} >{"help | ?"}</div>
+                <div class={classes!("btn-link")} {onclick} >{"► ❘ help"}</div>
             }
         </div>
     }
@@ -43,20 +44,22 @@ pub fn button(props: &HelpButtonProps) -> Html {
 
 #[derive(Properties, PartialEq)]
 pub struct NetworkButtonProps {
-    pub network: AttrValue,
+    pub switch_to: AttrValue,
     pub onclick: Callback<AttrValue>,
 }
 
 #[function_component(NetworkButton)]
 pub fn button(props: &NetworkButtonProps) -> Html {
-    let network = props.network.clone();
+    let switch_to = props.switch_to.clone();
 
-    let onclick = props.onclick.reform(move |_| network.clone());
+    let onclick = props.onclick.reform(move |_| switch_to.clone());
+
+    let label = format!("try {}", props.switch_to.clone());
 
     html! {
         <div class={classes!("network")}>
 
-            <button {onclick} >{ props.network.clone() }</button>
+            <div class={classes!("btn-link")} {onclick} >{ label }</div>
 
         </div>
     }
