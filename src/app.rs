@@ -119,13 +119,6 @@ impl Component for App {
                 network_state.subscription_id = Some(subscription_id);
             }
             Msg::NetworkDataReceived((subscription_id, block)) => {
-                info!(
-                    self.network_state.subscription_id
-                );
-                if self.network_state.is_initializing() {
-                    let network_state = Rc::make_mut(&mut self.network_state);
-                    network_state.status = NetworkStatus::Active;
-                }
                 if self.network_state.is_valid(subscription_id) {
                     self.blocks.insert(0, Some(block.clone()));
                     let hash = block.corespace_hash(self.core_view.clone());
