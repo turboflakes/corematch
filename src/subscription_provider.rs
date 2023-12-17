@@ -11,16 +11,18 @@ use yew::{
     Context, ContextHandle, Html, Properties,
 };
 
-use crate::runtimes::polkadot;
+use crate::runtimes::{kusama, polkadot};
 
 pub const STOP_SIGNAL: &str = "stop";
 pub const CONTINUE_SIGNAL: &str = "continue";
 
+pub type SubscriptionId = u32;
+
 pub enum Msg {
     Error(anyhow::Error),
     OnlineClientCreated(OnlineClient<PolkadotConfig>),
-    OnlineClientDataReceived(Block),
-    SubscriptionChannelCreated(UnboundedSender<AttrValue>),
+    OnlineClientDataReceived((SubscriptionId, Block)),
+    SubscriptionCreated((SubscriptionId, UnboundedSender<AttrValue>)),
     ContextChanged(Rc<NetworkState>),
 }
 
@@ -74,37 +76,46 @@ impl Component for SubscriptionProvider {
             }
             Msg::OnlineClientCreated(online_client) => {
                 self.online_client = Some(online_client);
-                let cb: Callback<Block> = ctx.link().callback(Msg::OnlineClientDataReceived);
+                let cb: Callback<(SubscriptionId, Block)> =
+                    ctx.link().callback(Msg::OnlineClientDataReceived);
                 let api = self.online_client.as_ref().unwrap().clone();
 
                 match self.state.runtime {
                     SupportedRuntime::Polkadot => ctx.link().send_future(
                         polkadot::subscribe_to_finalized_blocks(api, cb).map(
                             |result| match result {
-                                Ok(subscription_channel) => {
-                                    Msg::SubscriptionChannelCreated(subscription_channel)
+                                Ok((subscription_id, subscription_channel)) => {
+                                    Msg::SubscriptionCreated((
+                                        subscription_id,
+                                        subscription_channel,
+                                    ))
                                 }
                                 Err(err) => Msg::Error(err.into()),
                             },
                         ),
                     ),
-                    // SupportedRuntime::Kusama => {
-                    //     ctx.link()
-                    //         .send_future(kusama::subscribe_to_finalized_blocks(api, cb).map(
-                    //             |result| match result {
-                    //                 Ok(subscription_channel) => {
-                    //                     Msg::SubscriptionChannelCreated(subscription_channel)
-                    //                 }
-                    //                 Err(err) => Msg::Error(err.into()),
-                    //             },
-                    //         ))
-                    // }
-                    _ => unimplemented!(),
+                    SupportedRuntime::Kusama => {
+                        ctx.link()
+                            .send_future(kusama::subscribe_to_finalized_blocks(api, cb).map(
+                                |result| match result {
+                                    Ok((subscription_id, subscription_channel)) => {
+                                        Msg::SubscriptionCreated((
+                                            subscription_id,
+                                            subscription_channel,
+                                        ))
+                                    }
+                                    Err(err) => Msg::Error(err.into()),
+                                },
+                            ))
+                    } // _ => unimplemented!(),
                 };
                 true
             }
-            Msg::SubscriptionChannelCreated(subscription_channel) => {
+            Msg::SubscriptionCreated((subscription_id, subscription_channel)) => {
                 self.subscription_channel = Some(subscription_channel);
+
+                // send subscription_id to be updated by the app
+                self.state.subscription_callback.emit(subscription_id);
 
                 if let Some(subscription_channel) = &self.subscription_channel {
                     subscription_channel
@@ -114,7 +125,7 @@ impl Component for SubscriptionProvider {
 
                 true
             }
-            Msg::OnlineClientDataReceived(block) => {
+            Msg::OnlineClientDataReceived((subscription_id, block)) => {
                 if let Some(subscription_channel) = &self.subscription_channel {
                     subscription_channel
                         .send_now(CONTINUE_SIGNAL.into())
@@ -122,7 +133,7 @@ impl Component for SubscriptionProvider {
                 }
 
                 // send block to be processed by the app
-                self.state.runtime_callback.emit(block);
+                self.state.runtime_callback.emit((subscription_id, block));
 
                 true
             }

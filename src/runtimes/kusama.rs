@@ -5,6 +5,7 @@ use log::error;
 use node_runtime::runtime_types::{
     polkadot_parachain_primitives::primitives::Id, polkadot_primitives::v5::CoreOccupied,
 };
+use rand::Rng;
 use std::time::Duration;
 use subxt::{OnlineClient, PolkadotConfig};
 use yew::{
@@ -12,7 +13,7 @@ use yew::{
     AttrValue, Callback,
 };
 
-use crate::subscription_provider::STOP_SIGNAL;
+use crate::subscription_provider::{SubscriptionId, STOP_SIGNAL};
 
 #[subxt::subxt(
     runtime_metadata_path = "metadata/kusama_metadata.scale",
@@ -25,10 +26,13 @@ const SIX_SECS: Duration = Duration::from_secs(6);
 /// subscribes to finalized blocks, when a block is received, fetch storage for the block hash and send it via the callback.
 pub async fn subscribe_to_finalized_blocks(
     api: OnlineClient<PolkadotConfig>,
-    cb: Callback<Block>,
-) -> Result<UnboundedSender<AttrValue>, subxt::Error> {
+    cb: Callback<(SubscriptionId, Block)>,
+) -> Result<(SubscriptionId, UnboundedSender<AttrValue>), subxt::Error> {
     // Create channel so that an unsubscribe signal could be received.
     let (tx, mut rx) = yew::platform::pinned::mpsc::unbounded::<AttrValue>();
+    // Generate a unique subscription_id
+    let mut rng = rand::thread_rng();
+    let subscription_id = rng.gen::<u32>();
 
     spawn_local(async move {
         match api.blocks().subscribe_finalized().await {
@@ -40,6 +44,9 @@ pub async fn subscribe_to_finalized_blocks(
                             break;
                         }
                     }
+
+                    // NOTE: pause task for six seconds to ensure that data is processed always at the same pace
+                    sleep(SIX_SECS).await;
 
                     // 2nd process result
                     match result {
@@ -70,16 +77,14 @@ pub async fn subscribe_to_finalized_blocks(
                                             })
                                             .collect::<Corespace>();
 
-                                        cb.emit(Block::new(
-                                            block.number().clone(),
-                                            corespace.clone(),
+                                        cb.emit((
+                                            subscription_id,
+                                            Block::new(block.number().clone(), corespace.clone()),
                                         ));
                                     }
                                 }
                                 Err(e) => error!("{}", e),
                             }
-                            // NOTE: pause task for six seconds to ensure that data is processed always at the same pace
-                            sleep(SIX_SECS).await;
                         }
                         Err(e) => error!("{}", e),
                     }
@@ -88,5 +93,5 @@ pub async fn subscribe_to_finalized_blocks(
             Err(e) => error!("{}", e),
         }
     });
-    Ok(tx)
+    Ok((subscription_id, tx))
 }

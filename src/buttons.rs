@@ -15,7 +15,7 @@ pub fn button(props: &StartButtonProps) -> Html {
     html! {
         <div class={classes!("control")}>
             if !props.is_game_on {
-                <div class={classes!("btn-link")} {onclick} >{"► ❘ start"}</div>
+                <div class={classes!("btn-link")} {onclick} >{"start"}</div>
             }
         </div>
     }
@@ -36,7 +36,7 @@ pub fn button(props: &HelpButtonProps) -> Html {
     html! {
         <div class={classes!("control")}>
             if props.is_game_on && !props.is_help_on && props.duration > 0{
-                <div class={classes!("btn-link")} {onclick} >{"► ❘ help"}</div>
+                <div class={classes!("btn-link")} {onclick} >{"help"}</div>
             }
         </div>
     }
@@ -45,11 +45,16 @@ pub fn button(props: &HelpButtonProps) -> Html {
 #[derive(Properties, PartialEq)]
 pub struct NetworkButtonProps {
     pub switch_to: AttrValue,
+    pub visible: bool,
     pub onclick: Callback<AttrValue>,
 }
 
 #[function_component(NetworkButton)]
 pub fn button(props: &NetworkButtonProps) -> Html {
+    if !props.visible {
+        return html! {};
+    }
+
     let switch_to = props.switch_to.clone();
 
     let onclick = props.onclick.reform(move |_| switch_to.clone());
