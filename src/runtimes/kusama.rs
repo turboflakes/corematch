@@ -45,9 +45,6 @@ pub async fn subscribe_to_finalized_blocks(
                         }
                     }
 
-                    // NOTE: pause task for six seconds to ensure that data is processed always at the same pace
-                    sleep(SIX_SECS).await;
-
                     // 2nd process result
                     match result {
                         Ok(block) => {
@@ -85,6 +82,8 @@ pub async fn subscribe_to_finalized_blocks(
                                 }
                                 Err(e) => error!("{}", e),
                             }
+                            // NOTE: pause task for six seconds to ensure that data is processed always at the same pace
+                            sleep(SIX_SECS).await;
                         }
                         Err(e) => error!("{}", e),
                     }

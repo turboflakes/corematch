@@ -29,7 +29,6 @@ pub enum Msg {
     NetworkSubscriptionCreated(SubscriptionId),
     NetworkDataReceived((SubscriptionId, Block)),
     NetworkButtonClicked(AttrValue),
-    NetworkSwitched,
     BlockClicked(usize),
     BlockMatched,
     BlockAnimationEnded(BlockNumber),
@@ -99,24 +98,14 @@ impl Component for App {
                     let network_state = Rc::make_mut(&mut self.network_state);
                     network_state.status = NetworkStatus::Switching;
                     network_state.runtime = SupportedRuntime::from(network);
-
-                    ctx.link().send_future(async {
-                        // NOTE: wait a few seconds before switching network, it allows for current connection to unsubscribe
-                        sleep(SIX_SECS).await;
-                        Msg::NetworkSwitched
-                    });
                 }
-            }
-            Msg::NetworkSwitched => {
-                let network_state = Rc::make_mut(&mut self.network_state);
-                network_state.status = NetworkStatus::Active;
-
-                // apply a full reset
-                self.full_reset();
             }
             Msg::NetworkSubscriptionCreated(subscription_id) => {
                 let network_state = Rc::make_mut(&mut self.network_state);
                 network_state.subscription_id = Some(subscription_id);
+                network_state.status = NetworkStatus::Active;
+                // apply a full reset
+                self.full_reset();
             }
             Msg::NetworkDataReceived((subscription_id, block)) => {
                 if self.network_state.is_valid(subscription_id) {
