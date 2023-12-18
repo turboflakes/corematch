@@ -339,7 +339,7 @@ impl App {
                     </a>
                 }
             }
-        }        
+        }
     }
 
     fn head_right_view(&self, link: &Scope<Self>) -> Html {

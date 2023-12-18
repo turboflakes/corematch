@@ -41,8 +41,8 @@ impl std::fmt::Display for BlockView {
 pub struct Block {
     pub block_number: BlockNumber,
     pub corespace: Corespace,
+    pub runtime: SupportedRuntime,
     pub status: Status,
-    pub network_class: Option<String>,
     pub missed_class: Option<String>,
     pub matched_class: Option<String>,
     pub help_class: Option<String>,
@@ -53,8 +53,8 @@ impl Block {
         Self {
             block_number,
             corespace,
+            runtime,
             status: Status::Revealed,
-            network_class: Some(runtime.to_string().to_lowercase()),
             missed_class: None,
             matched_class: None,
             help_class: None,
@@ -80,6 +80,23 @@ impl Block {
 
     pub fn help(&mut self) {
         self.help_class = Some("help".to_string());
+    }
+
+    pub fn network_class(&self) -> String {
+        self.runtime.to_string().to_lowercase()
+    }
+
+    pub fn inline_style(&self) -> String {
+        match self.runtime {
+            SupportedRuntime::Polkadot => format!(
+                "background-color: rgba(230, 0, 122, {});",
+                self.corespace_usage() as f32 / 100.0
+            ),
+            SupportedRuntime::Kusama => format!(
+                "background-color: rgba(0, 0, 0, {});",
+                self.corespace_usage() as f32 / 100.0
+            ),
+        }
     }
 
     pub fn reset_class(&mut self) {
@@ -166,7 +183,7 @@ pub fn block(props: &Props) -> Html {
     let onanimationend = props.onanimationend.reform(move |_| block_number.clone());
 
     html! {
-        <div class={classes!("corespace", props.block.network_class.clone(), props.block.classes(),
+        <div class={classes!("corespace", props.block.network_class(), props.block.classes(),
             props.block.missed_class.clone(), props.block.matched_class.clone(),
             props.block.help_class.clone())}
             {onclick} {onanimationend}>
@@ -181,9 +198,8 @@ pub fn block(props: &Props) -> Html {
                             props.block.block_number.clone(),
                             props.block.corespace_usage()
                         );
-                        let inline_style = format!("background-color: rgba(230, 0, 122, {});", props.block.corespace_usage() as f32 / 100.0);
                         html! {
-                            <div class="corespace-palette" style={inline_style}>
+                            <div class="corespace-palette" style={props.block.inline_style()}>
                                 <span class="label">{ label }</span>
                             </div>
                         }
