@@ -9,7 +9,7 @@ use yew::{
 };
 
 use crate::block::{Block, BlockNumber, BlockView, Corespace};
-use crate::buttons::{BlockViewButton, HelpButton, NetworkButton, StartButton};
+use crate::buttons::{BlockViewButton, ActionButton, NetworkButton};
 use crate::core::{Core, CoreView};
 use crate::runtimes::support::SupportedRuntime;
 use crate::subscription_provider::{SubscriptionId, SubscriptionProvider};
@@ -187,6 +187,10 @@ impl Component for App {
                                 } else {
                                     block.missed();
                                     self.match_failed();
+                                    // verify if game is over
+                                    if self.is_game_over() {
+                                        ctx.link().send_message(Msg::GameFinished);
+                                    }
                                 }
                             } else {
                                 block.clicked();
@@ -231,7 +235,7 @@ impl Component for App {
                 self.start_help();
             }
             Msg::GameFinished => {
-                info!("GameFinished");
+                info!("** Game Over **");
                 // reset the current selected match block
                 if let Some(match_block) = &self.match_block {
                     if let Some(i) = self.blocks.iter().position(|opt| {
@@ -245,8 +249,6 @@ impl Component for App {
                         }
                     }
                 }
-                // reset game counters
-                self.reset();
                 // show view to share results and restart the game
                 // TODO
             }
@@ -261,10 +263,7 @@ impl Component for App {
         html! {
             <ContextProvider<Rc<NetworkState>> context={ network_state.clone() }>
 
-                if self.blocks.is_empty() {
-                    <p>{"Loading..."}</p>
-                }
-                else { { self.game_view(ctx.link()) } }
+                { self.game_view(ctx.link()) }
 
             </ContextProvider<Rc<NetworkState>>>
         }
@@ -285,22 +284,41 @@ impl App {
                     </div>
                     <div class="content-body">
                         { self.network_menu_view(link) }
-                        <div class="board">
-                            { for self.blocks.iter().enumerate().map(|(i, block_option)| {
-                                    if let Some(block) = block_option {
-                                        let block_clicked = link.callback(move |_| Msg::BlockClicked(i.clone()));
-                                        let block_animation_ended = link.callback(move |bn| Msg::BlockAnimationEnded(bn));
-                                        block.render(self.block_view.clone(), self.core_view.clone(), block_clicked.clone(), block_animation_ended.clone())
-                                    } else {
-                                        html! { <div class="corespace empty"></div> }
-                                    }
-                                })
+                        {
+                            match self.game_status {
+                                GameStatus::Over => { html! {  self.game_over_view(link) } }
+                                _ => { self.board_view(link) }
                             }
-                        </div>
+                        }  
                     </div>
                 </div>
                 { self.footer_view() }
             </>
+        }
+    }
+
+    fn game_over_view(&self, link: &Scope<Self>) -> Html {
+        html! {
+            <div class="game-over">
+                <h4>{"Game Over"}</h4>
+            </div>
+        }
+    }
+
+    fn board_view(&self, link: &Scope<Self>) -> Html {
+        html! {
+            <div class="board">
+                { for self.blocks.iter().enumerate().map(|(i, block_option)| {
+                        if let Some(block) = block_option {
+                            let block_clicked = link.callback(move |_| Msg::BlockClicked(i.clone()));
+                            let block_animation_ended = link.callback(move |bn| Msg::BlockAnimationEnded(bn));
+                            block.render(self.block_view.clone(), self.core_view.clone(), block_clicked.clone(), block_animation_ended.clone())
+                        } else {
+                            html! { <div class="corespace empty"></div> }
+                        }
+                    })
+                }
+            </div>
         }
     }
 
@@ -352,28 +370,36 @@ impl App {
         html! {
             <table class="game-stats">
                 <tr>
+                    <th>{"Points"}</th>
                     <th>{"Duration"}</th>
                     <th>{"Tries"}</th>
                     <th>{"Helps"}</th>
-                    <th>{"Points"}</th>
-                    { if self.is_game_on() { 
-                        html! { <th><div class="action game-on">{"It's ON!"}</div></th> } 
-                    } else { 
-                        html! { <th class="action"><StartButton onclick={start_onclick} /></th> } } 
-                    }
+                    { self.game_message_view(link) }
                 </tr>
                 <tr>
-                    // { if self.is_game_on() { html! { <td></td> } } else { html! {} } }
+                    <td class="points">{self.points}</td>
                     <td class="duration">{self.duration}</td>
                     <td class="tries">{self.tries}</td>
                     <td class="help-on">{self.help_duration}</td>
-                    <td class="points">{self.points}</td>
                     <td class="action">
-                        <HelpButton is_game_on={self.is_game_on()} is_help_on={self.is_help_on}
-                            duration={self.help_duration} onclick={help_onclick} />
+                        <ActionButton label={"▶ start"} disable={self.is_game_on()} onclick={start_onclick} />
+                        <ActionButton label={"▶ helps"} 
+                            disable={!self.is_game_on() || self.is_help_on || self.help_duration == 0} onclick={help_onclick} />
                     </td>
                 </tr>
             </table>
+        }
+    }
+
+    fn game_message_view(&self, link: &Scope<Self>) -> Html {
+        html! {
+            <th class="message">
+                { if self.is_game_on() { html! { <div class="game-on">{"It's ON!"}</div> } }
+                  else {
+                    html! { <div>{"Play COREMATCH!"}</div> }
+                  }
+                }
+            </th>
         }
     }
 
@@ -399,11 +425,11 @@ impl App {
     fn full_reset(&mut self) {
         self.reset();
         self.blocks = vec![None; 16];
-        self.match_block = None;
-        self.matches = BTreeMap::new();
     }
 
     fn reset(&mut self) {
+        self.match_block = None;
+        self.matches = BTreeMap::new();
         self.game_status = GameStatus::Standby;
         self.duration = 0;
         self.points = 0;
@@ -415,6 +441,10 @@ impl App {
 
     fn is_game_on(&self) -> bool {
         self.game_status == GameStatus::On
+    }
+
+    fn is_game_over(&self) -> bool {
+       self.game_status == GameStatus::Over
     }
 
     fn start(&mut self) {

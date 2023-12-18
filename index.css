@@ -35,18 +35,24 @@ body {
   height: 100vh;
 }
 
+th,
+td {
+  padding: 0.5rem 1.4rem;
+}
+
 tr {
   border-bottom: 0;
+  /* height: 56px; */
 }
 
 th {
   border-bottom: 2px solid rgb(0 0 0 / 0.8);
 }
-
+  
 .container {
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: space-between;
 }
 
 .header {
@@ -134,7 +140,7 @@ footer {
 .control .btn-link {
   background-color: rgb(15, 21, 25);
   color: #FFFFFF;
-  width: 100px;
+  width: 80px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -155,14 +161,14 @@ footer {
   cursor: pointer;
 }
 
-.game-on {
-  background-color: rgb(15, 21, 25);
-  color: #FFFFFF;
-  width: 100px;
-  display: flex;
-  justify-content: center;
-  margin: 0 1rem;
-  font-size: 1.8rem;
+.btn-link.disabled {
+  background-color: rgba(15, 21, 25, 0.2);
+  text-decoration: none;
+  cursor: default;
+}
+
+.btn-link:first-child {
+  margin-right: 0;
 }
 
 .game-controls {
@@ -179,12 +185,12 @@ footer {
   width: 6rem;
 }
 
-tr {
-  height: 56px;
-}
-
 .game-stats {
   margin-right: 1rem;
+}
+
+.game-stats tr {
+  height: 46px;
 }
 
 .game-stats li {
@@ -201,8 +207,16 @@ tr {
   font-size: 1.4rem;
 }
 
-.action {
-  min-height: 3rem;
+.action, .message {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  border-bottom: 0;
+  font-size: 2rem;
+}
+
+.hidden {
+  visibility: hidden;
 }
 
 .btn-network {
@@ -277,13 +291,13 @@ tr {
 .corespace.missed {
   border: 2px solid rgb(0 0 0 / 0.8);
   animation: headShake;
-  animation-duration: 0.8s;
+  animation-duration: 0.6s;
 }
 
 .corespace.matched {
   border: 2px solid rgb(0 0 0 / 0.8) !important;
   opacity: 1 !important;
-  animation: tada;
+  animation: heartBeat;
   animation-duration: 0.6s;
 }
 
@@ -330,4 +344,10 @@ tr {
   /* polkadot: #E6007A; */
   /* polkadot: rgb(230 0 122); */
   background-color: rgba(230, 0, 122, 1); 
+}
+
+.game-over {
+  width: 100%;
+  display: flex;
+  justify-content: center; 
 }

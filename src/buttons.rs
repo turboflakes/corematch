@@ -3,38 +3,24 @@ use crate::runtimes::support::SupportedRuntime;
 use yew::{classes, function_component, html, AttrValue, Callback, Html, Properties};
 
 #[derive(Properties, PartialEq)]
-pub struct StartButtonProps {
+pub struct ActionButtonProps {
+    pub disable: bool,
+    pub label: AttrValue,
     pub onclick: Callback<()>,
 }
 
-#[function_component(StartButton)]
-pub fn button(props: &StartButtonProps) -> Html {
+#[function_component(ActionButton)]
+pub fn button(props: &ActionButtonProps) -> Html {
     let onclick = props.onclick.reform(move |_| ());
+    let disabled_class = if props.disable { 
+        Some("disabled")
+    } else {
+        None
+    };
 
     html! {
         <div class={classes!("control")}>
-            <div class={classes!("btn-link")} {onclick} >{"▶ start"}</div>
-        </div>
-    }
-}
-
-#[derive(Properties, PartialEq)]
-pub struct HelpButtonProps {
-    pub is_game_on: bool,
-    pub is_help_on: bool,
-    pub duration: u32,
-    pub onclick: Callback<()>,
-}
-
-#[function_component(HelpButton)]
-pub fn button(props: &HelpButtonProps) -> Html {
-    let onclick = props.onclick.reform(move |_| ());
-
-    html! {
-        <div class={classes!("control")}>
-            if props.is_game_on && !props.is_help_on && props.duration > 0{
-                <div class={classes!("btn-link")} {onclick} >{"▶ helps"}</div>
-            }
+            <div class={classes!("btn-link", disabled_class)} {onclick} >{format!("{}", props.label.to_string())}</div>
         </div>
     }
 }
