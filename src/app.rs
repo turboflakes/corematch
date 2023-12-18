@@ -277,17 +277,14 @@ impl App {
             <>
                 <div class="content">
                     <div class="content-header">
-                        <a class="logo-img" href="https://polkadot.network" target="_blank">
-                            <img class="icon-img" src="/assets/Polkadot_Logo_Horizontal_Pink-Black.svg" alt="polkadot logo" />
-                        </a>
-                        { self.game_stats_view() }
+                        { self.game_stats_view(link) }
                     </div>
                     <div class="content-menu">
-                        { self.head_menu_left_view(link) }
-                        { self.head_menu_right_view(link) }
+                        { self.head_left_view(link) }
+                        { self.head_right_view(link) }
                     </div>
                     <div class="content-body">
-                        { self.game_controls_right_view(link) }
+                        { self.network_menu_view(link) }
                         <div class="board">
                             { for self.blocks.iter().enumerate().map(|(i, block_option)| {
                                     if let Some(block) = block_option {
@@ -307,7 +304,15 @@ impl App {
         }
     }
 
-    fn head_menu_left_view(&self, link: &Scope<Self>) -> Html {
+    fn head_left_view(&self, _link: &Scope<Self>) -> Html {
+        html! {
+            <a class="logo-network" href="https://polkadot.network" target="_blank">
+                <img class="icon-img" src="/assets/Polkadot_Logo_Horizontal_Pink-Black.svg" alt="polkadot logo" />
+            </a>
+        }
+    }
+
+    fn head_right_view(&self, link: &Scope<Self>) -> Html {
         let option_click = link.callback(move |e| Msg::BlockViewClicked(e));
         html! {
             <div class="block-view-options">
@@ -321,7 +326,7 @@ impl App {
         }
     }
 
-    fn head_menu_right_view(&self, link: &Scope<Self>) -> Html {
+    fn network_menu_view(&self, link: &Scope<Self>) -> Html {
         let network_state = self.network_state.clone();
         let network_onclick = link.callback(move |e| Msg::NetworkButtonClicked(e));
         let visible = self.network_state.is_active();
@@ -340,49 +345,33 @@ impl App {
         }
     }
 
-    fn game_controls_right_view(&self, link: &Scope<Self>) -> Html {
+    fn game_stats_view(&self, link: &Scope<Self>) -> Html {
         let start_onclick = link.callback(move |_| Msg::StartButtonClicked);
         let help_onclick = link.callback(move |_| Msg::HelpButtonClicked);
-        html! {
-            <div class="game-controls-right">
-                <StartButton is_game_on={self.is_game_on()} onclick={start_onclick} />
-                <HelpButton is_game_on={self.is_game_on()} is_help_on={self.is_help_on}
-                    duration={self.help_duration} onclick={help_onclick} />
-            </div>
-        }
-    }
-
-    fn is_game_on_view(&self) -> Html {
-        html! {
-            if self.is_game_on() {
-                <div class="game-on">{"GAME ON!"}</div>
-            } else { }
-        }
-    }
-
-    fn game_stats_view(&self) -> Html {
-        let help_class = if self.is_help_on {
-            Some("help-on")
-        } else {
-            None
-        };
 
         html! {
             <table class="game-stats">
                 <tr>
-                    { if self.is_game_on() { html! { <th class="game-on" rowspan="2">{"It's ON!"}</th> } } else { html! {} } }
-
                     <th>{"Duration"}</th>
                     <th>{"Tries"}</th>
                     <th>{"Helps"}</th>
                     <th>{"Points"}</th>
+                    { if self.is_game_on() { 
+                        html! { <th><div class="action game-on">{"It's ON!"}</div></th> } 
+                    } else { 
+                        html! { <th class="action"><StartButton onclick={start_onclick} /></th> } } 
+                    }
                 </tr>
                 <tr>
                     // { if self.is_game_on() { html! { <td></td> } } else { html! {} } }
-                    <td>{self.duration}</td>
-                    <td>{self.tries}</td>
-                    <td class={classes!(help_class)}>{self.help_duration}</td>
+                    <td class="duration">{self.duration}</td>
+                    <td class="tries">{self.tries}</td>
+                    <td class="help-on">{self.help_duration}</td>
                     <td class="points">{self.points}</td>
+                    <td class="action">
+                        <HelpButton is_game_on={self.is_game_on()} is_help_on={self.is_help_on}
+                            duration={self.help_duration} onclick={help_onclick} />
+                    </td>
                 </tr>
             </table>
         }
@@ -392,13 +381,13 @@ impl App {
         html! {
             <footer class="footer">
                 <div class="footer-content">
+                    <div class="caption">{"COREMATCH // Built by TurboFlakes // Unstoppable by Polkadot"}</div>
+                    <div class="caption">{"© 2023 TurboFlakes"}</div>
+                </div>
+                <div class="footer-icons">
                     <a class="logo" href="https://turboflakes.io" target="_blank">
                         <img class="icon-img" src="/assets/logo_mark_black_subtract_turboflakes_.svg" alt="turboflakes logo" />
                     </a>
-                    <span>{"Corematch built by TurboFlakes © 2023 // Unstoppable by Polkadot"}</span>
-                </div>
-
-                <div class="footer-content">
                     <a class="logo" href="https://github.com/turboflakes/corematch" target="_blank">
                         <img class="icon-img" src="/assets/github.svg" alt="github logo" />
                     </a>

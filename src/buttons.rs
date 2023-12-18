@@ -4,7 +4,6 @@ use yew::{classes, function_component, html, AttrValue, Callback, Html, Properti
 
 #[derive(Properties, PartialEq)]
 pub struct StartButtonProps {
-    pub is_game_on: bool,
     pub onclick: Callback<()>,
 }
 
@@ -14,9 +13,7 @@ pub fn button(props: &StartButtonProps) -> Html {
 
     html! {
         <div class={classes!("control")}>
-            if !props.is_game_on {
-                <div class={classes!("btn-link")} {onclick} >{"start"}</div>
-            }
+            <div class={classes!("btn-link")} {onclick} >{"▶ start"}</div>
         </div>
     }
 }
@@ -36,7 +33,7 @@ pub fn button(props: &HelpButtonProps) -> Html {
     html! {
         <div class={classes!("control")}>
             if props.is_game_on && !props.is_help_on && props.duration > 0{
-                <div class={classes!("btn-link")} {onclick} >{"help"}</div>
+                <div class={classes!("btn-link")} {onclick} >{"▶ helps"}</div>
             }
         </div>
     }
@@ -59,10 +56,10 @@ pub fn button(props: &NetworkButtonProps) -> Html {
 
     let onclick = props.onclick.reform(move |_| switch_to.clone());
 
-    let label = format!("try {}", props.switch_to.clone());
+    let label = format!("switch to {}", props.switch_to.clone());
 
     html! {
-        <div class={classes!("network")}>
+        <div class={classes!("btn-network")}>
 
             <div class={classes!("btn-link")} {onclick} >{ label }</div>
 

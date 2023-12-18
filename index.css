@@ -35,6 +35,20 @@ body {
   height: 100vh;
 }
 
+tr {
+  border-bottom: 0;
+}
+
+th {
+  border-bottom: 2px solid rgb(0 0 0 / 0.8);
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
 .header {
   padding: 4rem 0;
   margin: 0 auto;
@@ -63,9 +77,13 @@ footer {
   width: calc(4rem + (4 * (4px + (12 * 10 * 1px))));
 }
 
-.footer-content {
+.footer-icons {
   display: flex;
   align-items: center;
+}
+
+.caption {
+  font-size: 1.5;
 }
 
 .logo {
@@ -82,9 +100,8 @@ footer {
   margin-right: 0;
 }
 
-.logo-img {
-  margin: 1rem 0 0 1rem;
-  height: 2rem;
+.logo-network {
+  margin-left: 1rem;
 }
 
 .icon-img {
@@ -99,7 +116,7 @@ footer {
 
 .content-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   margin-bottom: 3rem;
 }
 
@@ -114,9 +131,19 @@ footer {
   margin-bottom: 1rem;
 }
 
+.control .btn-link {
+  background-color: rgb(15, 21, 25);
+  color: #FFFFFF;
+  width: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .btn-link {
   margin: 0 1rem;
   font-size: 1.8rem;
+  /* text-transform: none; */
 }
 
 .btn-link.selected {
@@ -126,6 +153,16 @@ footer {
 .btn-link:hover {
   text-decoration: underline;
   cursor: pointer;
+}
+
+.game-on {
+  background-color: rgb(15, 21, 25);
+  color: #FFFFFF;
+  width: 100px;
+  display: flex;
+  justify-content: center;
+  margin: 0 1rem;
+  font-size: 1.8rem;
 }
 
 .game-controls {
@@ -138,7 +175,12 @@ footer {
 .game-controls-right {
   position: absolute;
   top: 0;
-  right: -9rem;
+  right: -6rem;
+  width: 6rem;
+}
+
+tr {
+  height: 56px;
 }
 
 .game-stats {
@@ -153,10 +195,21 @@ footer {
   text-align: center;
 }
 
-.help-on, .points {
+.duration, .tries, .help-on, .points {
   font-family: 'Pixel Operator Mono HB8', Courier, monospace;
   color: rgb(15, 21, 25);
   font-size: 1.4rem;
+}
+
+.action {
+  min-height: 3rem;
+}
+
+.btn-network {
+  position: absolute;
+  top: 6rem;
+  right: -9rem;
+  transform: rotate(90deg);
 }
 
 .content-body {
