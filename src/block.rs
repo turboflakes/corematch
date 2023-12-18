@@ -1,4 +1,7 @@
-use crate::core::{Core, CoreView};
+use crate::{
+    core::{Core, CoreView},
+    runtimes::support::SupportedRuntime,
+};
 use futures::io::Empty;
 use log::{error, info};
 use std::str::FromStr;
@@ -39,17 +42,19 @@ pub struct Block {
     pub block_number: BlockNumber,
     pub corespace: Corespace,
     pub status: Status,
+    pub network_class: Option<String>,
     pub missed_class: Option<String>,
     pub matched_class: Option<String>,
     pub help_class: Option<String>,
 }
 
 impl Block {
-    pub fn new(block_number: BlockNumber, corespace: Corespace) -> Self {
+    pub fn new(block_number: BlockNumber, corespace: Corespace, runtime: SupportedRuntime) -> Self {
         Self {
             block_number,
             corespace,
             status: Status::Revealed,
+            network_class: Some(runtime.to_string().to_lowercase()),
             missed_class: None,
             matched_class: None,
             help_class: None,
@@ -161,7 +166,7 @@ pub fn block(props: &Props) -> Html {
     let onanimationend = props.onanimationend.reform(move |_| block_number.clone());
 
     html! {
-        <div class={classes!("corespace", props.block.classes(),
+        <div class={classes!("corespace", props.block.network_class.clone(), props.block.classes(),
             props.block.missed_class.clone(), props.block.matched_class.clone(),
             props.block.help_class.clone())}
             {onclick} {onanimationend}>

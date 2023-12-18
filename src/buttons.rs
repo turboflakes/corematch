@@ -12,7 +12,7 @@ pub struct ActionButtonProps {
 #[function_component(ActionButton)]
 pub fn button(props: &ActionButtonProps) -> Html {
     let onclick = props.onclick.reform(move |_| ());
-    let disabled_class = if props.disable { 
+    let disabled_class = if props.disable {
         Some("disabled")
     } else {
         None

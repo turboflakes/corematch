@@ -1,5 +1,6 @@
 use crate::block::{Block, Corespace};
 use crate::core::Core;
+use crate::SupportedRuntime;
 use futures::StreamExt;
 use log::{error, info};
 use node_runtime::runtime_types::{
@@ -76,7 +77,11 @@ pub async fn subscribe_to_finalized_blocks(
 
                                         cb.emit((
                                             subscription_id,
-                                            Block::new(block.number().clone(), corespace.clone()),
+                                            Block::new(
+                                                block.number().clone(),
+                                                corespace.clone(),
+                                                SupportedRuntime::Polkadot,
+                                            ),
                                         ));
                                     }
                                 }

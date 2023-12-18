@@ -48,7 +48,11 @@ tr {
 th {
   border-bottom: 2px solid rgb(0 0 0 / 0.8);
 }
-  
+
+.kusama-size {
+  width: calc(4rem + (4 * (4px + (12 * 10 * 1px))));
+}
+
 .container {
   display: flex;
   flex-direction: column;
@@ -227,19 +231,16 @@ footer {
 }
 
 .content-body {
-  margin: 0 auto;
+  padding: 3rem;
   position: relative;
   display: flex;
   align-items: center;
-  width: calc(6rem + (4 * (4px + (12 * 10 * 1px))));
-  height: calc(6rem + (4 * (4px + (12 * 10 * 1px))));
   border-radius: 1rem;
   box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px, rgb(15, 21, 25) 0px 0px 0px 3px;
   background-color: #FFFFFF;
 }
 
 .board {
-  margin: 0 auto;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -259,10 +260,10 @@ footer {
   flex-wrap: wrap;
   gap: 2px;
   aspect-ratio: 1;
-  inline-size: calc(12 * 10 * 1px);
-  block-size: calc(12 * 10 * 1px);
   border: 2px solid rgb(230 234 246 / 1);
   border-radius: calc(6 * 0.65 * 1px);
+  inline-size: calc(12 * 10 * 1px);
+  block-size: calc(12 * 10 * 1px);
 }
 
 .corespace:hover {
@@ -281,7 +282,6 @@ footer {
 
 .corespace.empty {
   cursor: auto;
-  border: 2px solid rgb(0 0 0 / 0.06);
 }
 
 .corespace.highlight {
@@ -325,11 +325,19 @@ footer {
   padding: 0;
   contain: strict;
   aspect-ratio: 1;
-  inline-size: 12px;
-  block-size: 12px;
   border: 1px solid rgb(0 0 0 / 0.06);
   border-radius: calc(6 * 0.15 * 1px);
   /* will-change: transform; */
+}
+
+.corespace.polkadot .core { 
+  inline-size: 12px;
+  block-size: 12px;
+}
+
+.corespace.kusama .core { 
+  inline-size: 9px;
+  block-size: 9px;
 }
 
 .core:last-child {
@@ -344,6 +352,16 @@ footer {
   /* polkadot: #E6007A; */
   /* polkadot: rgb(230 0 122); */
   background-color: rgba(230, 0, 122, 1); 
+}
+
+.corespace.polkadot .core--1 { 
+  /* polkadot: #E6007A; */
+  /* polkadot: rgb(230 0 122); */
+  background-color: rgba(230, 0, 122, 1); 
+}
+
+.corespace.kusama .core--1 { 
+  background-color: rgb(0, 0, 0); 
 }
 
 .game-over {

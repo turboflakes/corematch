@@ -9,7 +9,7 @@ use yew::{
 };
 
 use crate::block::{Block, BlockNumber, BlockView, Corespace};
-use crate::buttons::{BlockViewButton, ActionButton, NetworkButton};
+use crate::buttons::{ActionButton, BlockViewButton, NetworkButton};
 use crate::core::{Core, CoreView};
 use crate::runtimes::support::SupportedRuntime;
 use crate::subscription_provider::{SubscriptionId, SubscriptionProvider};
@@ -62,7 +62,7 @@ impl Component for App {
 
     fn create(ctx: &Context<Self>) -> Self {
         // Set default runtime as Polkadot
-        let runtime = SupportedRuntime::Polkadot;
+        let runtime = SupportedRuntime::Kusama;
         let runtime_callback = ctx.link().callback(Msg::NetworkDataReceived);
         let subscription_callback = ctx.link().callback(Msg::NetworkSubscriptionCreated);
         // Initialized shared state
@@ -138,7 +138,7 @@ impl Component for App {
                             }
                         }
                     }
-                    debug!("_matches {:?}", self.matches);
+                    // debug!("_matches {:?}", self.matches);
                     // update game stats if game is on
                     self.incr_duration();
                     // highlight matches if help is on
@@ -274,7 +274,7 @@ impl App {
     fn game_view(&self, link: &Scope<Self>) -> Html {
         html! {
             <>
-                <div class="content">
+                <div class={classes!("content", Some(self.network_state.runtime.to_string().to_lowercase()))}>
                     <div class="content-header">
                         { self.game_stats_view(link) }
                     </div>
@@ -289,7 +289,7 @@ impl App {
                                 GameStatus::Over => { html! {  self.game_over_view(link) } }
                                 _ => { self.board_view(link) }
                             }
-                        }  
+                        }
                     </div>
                 </div>
                 { self.footer_view() }
@@ -306,6 +306,7 @@ impl App {
     }
 
     fn board_view(&self, link: &Scope<Self>) -> Html {
+        let network_class = Some(self.network_state.runtime.to_string().to_lowercase());
         html! {
             <div class="board">
                 { for self.blocks.iter().enumerate().map(|(i, block_option)| {
@@ -314,7 +315,7 @@ impl App {
                             let block_animation_ended = link.callback(move |bn| Msg::BlockAnimationEnded(bn));
                             block.render(self.block_view.clone(), self.core_view.clone(), block_clicked.clone(), block_animation_ended.clone())
                         } else {
-                            html! { <div class="corespace empty"></div> }
+                            html! { <div class={classes!("corespace", Some(self.network_state.runtime.to_string().to_lowercase()), "empty")}></div> }
                         }
                     })
                 }
@@ -323,11 +324,22 @@ impl App {
     }
 
     fn head_left_view(&self, _link: &Scope<Self>) -> Html {
-        html! {
-            <a class="logo-network" href="https://polkadot.network" target="_blank">
-                <img class="icon-img" src="/assets/Polkadot_Logo_Horizontal_Pink-Black.svg" alt="polkadot logo" />
-            </a>
-        }
+        match self.network_state.runtime {
+            SupportedRuntime::Polkadot => {
+                html! {
+                    <a class="logo-network" href="https://polkadot.network" target="_blank">
+                        <img class="icon-img" src="/assets/Polkadot_Logo_Horizontal_Pink-Black.svg" alt="polkadot logo" />
+                    </a>
+                }
+            }
+            SupportedRuntime::Kusama => {
+                html! {
+                    <a class="logo-network" href="https://kusama.network" target="_blank">
+                        <img class="icon-img" src="/assets/KUSAMA_6.svg" alt="kusama logo" />
+                    </a>
+                }
+            }
+        }        
     }
 
     fn head_right_view(&self, link: &Scope<Self>) -> Html {
@@ -383,7 +395,7 @@ impl App {
                     <td class="help-on">{self.help_duration}</td>
                     <td class="action">
                         <ActionButton label={"▶ start"} disable={self.is_game_on()} onclick={start_onclick} />
-                        <ActionButton label={"▶ helps"} 
+                        <ActionButton label={"▶ helps"}
                             disable={!self.is_game_on() || self.is_help_on || self.help_duration == 0} onclick={help_onclick} />
                     </td>
                 </tr>
@@ -444,7 +456,7 @@ impl App {
     }
 
     fn is_game_over(&self) -> bool {
-       self.game_status == GameStatus::Over
+        self.game_status == GameStatus::Over
     }
 
     fn start(&mut self) {
