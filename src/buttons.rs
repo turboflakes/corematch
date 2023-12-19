@@ -49,7 +49,7 @@ pub fn button(props: &ShareButtonProps) -> Html {
     html! {
         <div class="share">
             <ActionButton label={props.label.clone()} disable={false} {onclick} />
-            <span class={classes!("action-msg", *visible_class)}>{"copied scores to clipboard"}</span>
+            <span class={classes!("action-msg", *visible_class)}>{"results copied to clipboard"}</span>
         </div>
     }
 }
@@ -101,5 +101,20 @@ pub fn button(props: &BlockViewProps) -> Html {
 
     html! {
         <div class={classes!("btn-link", selected_class)} {onclick}>{ props.view.clone() }</div>
+    }
+}
+
+#[derive(Properties, PartialEq)]
+pub struct InfoProps {
+    pub label: AttrValue,
+    pub onclick: Callback<()>,
+}
+
+#[function_component(InfoButton)]
+pub fn button(props: &InfoProps) -> Html {
+    let onclick = props.onclick.reform(move |_| ());
+
+    html! {
+        <div class={classes!("btn-link")} {onclick}>{format!("{}", props.label.to_string())}</div>
     }
 }

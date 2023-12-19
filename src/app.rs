@@ -1,5 +1,5 @@
 use crate::block::{Block, BlockNumber, BlockView, Corespace};
-use crate::buttons::{ActionButton, BlockViewButton, NetworkButton, ShareButton};
+use crate::buttons::{ActionButton, BlockViewButton, NetworkButton, ShareButton, InfoButton};
 use crate::core::{Core, CoreView};
 use crate::runtimes::support::SupportedRuntime;
 use crate::subscription_provider::{SubscriptionId, SubscriptionProvider};
@@ -16,7 +16,7 @@ use yew::{
 
 const DEFAULT_INITIAL_POINTS: u32 = 0;
 const DEFAULT_INITIAL_DURATION: u32 = 0;
-const DEFAULT_INITIAL_TRIES: u32 = 4;
+const DEFAULT_INITIAL_TRIES: u32 = 6;
 const DEFAULT_INITIAL_HELPS: u32 = 16;
 
 #[derive(Clone, PartialEq)]
@@ -36,6 +36,7 @@ pub enum Msg {
     BlockAnimationEnded(BlockNumber),
     StartButtonClicked,
     HelpButtonClicked,
+    InfoButtonClicked,
     GameFinished,
     BlockViewClicked(BlockView),
 }
@@ -57,6 +58,7 @@ pub struct App {
     is_help_on: bool,
     is_help_disabled: bool,
     help_duration: u32,
+    is_info_on: bool,
 }
 
 impl Component for App {
@@ -92,6 +94,7 @@ impl Component for App {
             is_help_on: false,
             is_help_disabled: false,
             help_duration: DEFAULT_INITIAL_HELPS,
+            is_info_on: false,
         }
     }
 
@@ -241,6 +244,9 @@ impl Component for App {
             Msg::HelpButtonClicked => {
                 self.start_help();
             }
+            Msg::InfoButtonClicked => {
+                self.is_info_on = !self.is_info_on;
+            }
             Msg::GameFinished => {
                 info!("** Game Over **");
                 info!("\n{}", self.share_message().unwrap_or_default());
@@ -257,8 +263,6 @@ impl Component for App {
                         }
                     }
                 }
-                // show view to share results and restart the game
-                // TODO
             }
             Msg::BlockViewClicked(view) => {
                 self.block_view = view;
@@ -282,16 +286,17 @@ impl App {
     fn game_view(&self, link: &Scope<Self>) -> Html {
         html! {
             <>
-                <div class={classes!("content", Some(self.network_state.runtime.to_string().to_lowercase()))}>
-                    <div class="content-header">
-                        { self.game_stats_view(link) }
-                    </div>
+                <div class="content-stats">
+                    { self.game_stats_view(link) }
+                </div>
+                <div class="content-wrapper">
                     <div class="content-menu">
                         { self.head_left_view(link) }
                         { self.head_right_view(link) }
                     </div>
                     <div class="content-body">
-                        { self.network_menu_view(link) }
+                        { self.right_menu_view(link) }
+                        { self.info_view(link) }
                         {
                             match self.game_status {
                                 GameStatus::Resetting => { html! {  self.game_resetting_view(link) } }
@@ -300,8 +305,8 @@ impl App {
                             }
                         }
                     </div>
+                    { self.footer_view() }
                 </div>
-                { self.footer_view() }
             </>
         }
     }
@@ -367,21 +372,25 @@ impl App {
 
     fn head_right_view(&self, link: &Scope<Self>) -> Html {
         let option_click = link.callback(move |e| Msg::BlockViewClicked(e));
+        let info_click = link.callback(move |_| Msg::InfoButtonClicked);
+        
         html! {
-            <div class="block-view-options">
+            <div class="top-right-options">
                 <BlockViewButton view={BlockView::Cores}
                     selected={self.block_view == BlockView::Cores}
                     onclick={option_click.clone()} />
                 <BlockViewButton view={BlockView::Palette}
                     selected={self.block_view == BlockView::Palette}
                     onclick={option_click.clone()} />
+                <InfoButton label="ⓘ" onclick={info_click} />
             </div>
         }
     }
 
-    fn network_menu_view(&self, link: &Scope<Self>) -> Html {
+    fn right_menu_view(&self, link: &Scope<Self>) -> Html {
         let network_state = self.network_state.clone();
         let network_onclick = link.callback(move |e| Msg::NetworkButtonClicked(e));
+        
         let visible = self.network_state.is_active();
 
         html! {
@@ -395,6 +404,28 @@ impl App {
                     }
                 }}
             </SubscriptionProvider>
+        }
+    }
+
+    fn info_view(&self, link: &Scope<Self>) -> Html {
+        let visible_class = if self.is_info_on {
+            Some("visible")
+        } else {
+            Some("hidden")
+        };
+
+        html! {
+            <div class={classes!("info-view", visible_class)}>
+                <h5>{"Corematch"}</h5>
+                <h6>{"What is this?"}</h6>
+                <p>{"Corematch is a memory game where the player has to match the latest Polkadot (or Kusama) corespace usage in a 4x4 matrix."}</p>
+                <h6>{"What are the rules?"}</h6>
+                <p>{"The rules are straightforward: with every finalized block, the corespace usage is unveiled and displayed. 
+                Your mission is to earn points by spotting a matching pattern from the preceding blocks. Be careful though - a wrong block selection results in the loss of a try. 
+                The game kicks of when you press '▶ start' and concludes when you exhaust all available tries."}</p>
+                <p>{"When the game is over, share your results with friends and family. Challenge them to join you in the Corematch game and embark on a quest for the highest score."}</p>
+                <p>{"Have fun and enjoy ✌️"}</p>
+            </div>
         }
     }
 

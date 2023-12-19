@@ -107,7 +107,8 @@ impl Component for SubscriptionProvider {
                                     Err(err) => Msg::Error(err.into()),
                                 },
                             ))
-                    } // _ => unimplemented!(),
+                    } 
+                    // _ => unimplemented!(),
                 };
                 true
             }

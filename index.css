@@ -14,12 +14,6 @@
   font-style: normal;
 }
 
-html {
-  background: linear-gradient(270deg,#FFFFFF,rgb(230 234 246));
-  background: -moz-linear-gradient(270deg,#FFFFFF,rgb(230 234 246));
-  background: -webkit-linear-gradient(270deg,#FFFFFF,rgb(230 234 246));
-}
-
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Pixel Operator Mono HB8', Courier, monospace;
   color: rgb(15, 21, 25);
@@ -30,7 +24,18 @@ body, p, span, div, ul, li, a {
   color: rgb(15, 21, 25);
 }
 
+p {
+  font-size: 1.8rem;
+}
+
+h6, p {
+  margin-bottom: 1.5rem;
+}
+
 body {
+  background: linear-gradient(270deg,#FFFFFF,rgb(230 234 246));
+  background: -moz-linear-gradient(270deg,#FFFFFF,rgb(230 234 246));
+  background: -webkit-linear-gradient(270deg,#FFFFFF,rgb(230 234 246));
   height: 100vh;
 }
 
@@ -46,7 +51,9 @@ tr {
 
 th {
   text-align: center;
-  border-bottom: 2px solid rgb(0 0 0 / 0.8);
+  vertical-align:bottom;
+  border-bottom: 0;
+  /* border-bottom: 2px solid rgb(0 0 0 / 0.8); */
 }
 
 .kusama-size {
@@ -56,17 +63,17 @@ th {
 .container {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-around;
+  align-items: center;
+  min-height: 80vh;
 }
 
 .header {
-  padding: 4rem 0;
-  margin: 0 auto;
+  margin: 3rem auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: calc(4rem + (4 * (4px + (12 * 10 * 1px))));
 }
 
 .title {
@@ -119,15 +126,14 @@ footer {
   height: 2rem;
 }
 
-.content {
-  margin: 0 auto;
+.content-stats {
+  display: flex;
+  justify-content: center;
   width: calc(6rem + (4 * (4px + (12 * 10 * 1px))));
 }
 
-.content-header {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 3rem;
+.content-wrapper {
+  width: calc(6rem + (4 * (4px + (12 * 10 * 1px))));
 }
 
 .content-menu {
@@ -136,13 +142,14 @@ footer {
   align-items: center;
 }
 
-.block-view-options {
+.top-right-options {
   display: flex;
   align-items: flex-end;
   margin-bottom: 1rem;
 }
 
 .control .btn-link {
+  margin: 0 0.5rem;
   background-color: rgb(15, 21, 25);
   color: #FFFFFF;
   min-width: 108px;
@@ -153,7 +160,7 @@ footer {
 
 .btn-link {
   margin: 0 1rem;
-  padding: 0.5rem;
+  /* padding: 0.5rem; */
   font-size: 1.8rem;
   /* text-transform: none; */
 }
@@ -177,6 +184,10 @@ footer {
   margin-right: 0;
 }
 
+.btn-link:last-child {
+  /* margin-left: 0; */
+}
+
 .game-controls {
   display: flex;
   justify-content: space-between;
@@ -193,11 +204,8 @@ footer {
 
 .game-stats {
   margin-left: 1rem;
+  margin-bottom: 3rem;
   width: 100%;
-}
-
-.game-stats tr {
-  height: 46px;
 }
 
 .game-stats li {
@@ -210,7 +218,6 @@ footer {
 
 .duration, .tries, .help-on, .points {
   font-family: 'Pixel Operator Mono HB8', Courier, monospace;
-  color: rgb(15, 21, 25);
   font-size: 1.4rem;
 }
 
@@ -218,8 +225,7 @@ footer {
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  border-bottom: 0;
-  font-size: 2rem;
+  font-size: 1.8rem;
 }
 
 .hidden {
@@ -394,4 +400,13 @@ footer {
 
 .action-msg.visible {
   visibility: visible;
+}
+
+.info-view {
+  position: absolute;
+  background-color: #FFFFFF;
+  padding: 2rem;
+  width: calc(4 * (4px + (12 * 10 * 1px)));
+  height: 100%;
+  z-index: 1;
 }

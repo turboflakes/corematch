@@ -9,13 +9,14 @@
     <link rel="stylesheet" href="/assets/animate.min.css" />
     <link rel="stylesheet" href="/index.css" />
   </head>
-  <body class="container">
-    <header class="header">
-      <h1 class="title">COREMATCH</h1>
-      <div class="subtitle">Polkadot Matching Game</div>
-    </header>
-    <div id="app" />
-
+  <body>
+    <div class="container">
+      <header class="header">
+        <h1 class="title">COREMATCH</h1>
+        <div class="subtitle">The Polkadot Matching Game</div>
+      </header>
+      <div id="app" />
+    </div>
     <script type="module">
       import init, { init_app } from "./pkg/corematch.js";
       var element = document.getElementById("app");
