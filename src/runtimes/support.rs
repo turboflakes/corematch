@@ -25,6 +25,20 @@ impl SupportedRuntime {
             // Self::Westend => "wss://rpc.ibp.network/westend".to_string(),
         }
     }
+
+    pub fn columns_size(&self) -> u32 {
+        match &self {
+            Self::Polkadot => 8,
+            Self::Kusama => 10,
+        }
+    }
+
+    pub fn hashtag(&self) -> String {
+        match &self {
+            Self::Polkadot => "#Polkadot".to_string(),
+            Self::Kusama => "#KusamaNetwork".to_string(),
+        }
+    }
 }
 
 impl From<AttrValue> for SupportedRuntime {

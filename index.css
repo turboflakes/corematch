@@ -133,6 +133,7 @@ footer {
 .content-menu {
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 
 .block-view-options {
@@ -144,7 +145,7 @@ footer {
 .control .btn-link {
   background-color: rgb(15, 21, 25);
   color: #FFFFFF;
-  width: 80px;
+  min-width: 108px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -152,6 +153,7 @@ footer {
 
 .btn-link {
   margin: 0 1rem;
+  padding: 0.5rem;
   font-size: 1.8rem;
   /* text-transform: none; */
 }
@@ -238,6 +240,7 @@ footer {
   border-radius: 1rem;
   box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px, rgb(15, 21, 25) 0px 0px 0px 3px;
   background-color: #FFFFFF;
+  height: calc(6rem + (4 * (4px + (12 * 10 * 1px))));
 }
 
 .board {
@@ -367,5 +370,28 @@ footer {
 .game-over {
   width: 100%;
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center; 
+}
+
+.game-over .share {
+  position: relative;
+}
+
+.game-over .btn-link {
+  width: 128px;
+  text-transform: uppercase;
+}
+
+.game-over .action-msg {
+  position: absolute;
+  left: 1rem;
+  white-space: nowrap;
+  visibility: hidden;
+}
+
+
+.action-msg.visible {
+  visibility: visible;
 }

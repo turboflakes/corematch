@@ -1,3 +1,9 @@
+use crate::block::{Block, BlockNumber, BlockView, Corespace};
+use crate::buttons::{ActionButton, BlockViewButton, NetworkButton, ShareButton};
+use crate::core::{Core, CoreView};
+use crate::runtimes::support::SupportedRuntime;
+use crate::subscription_provider::{SubscriptionId, SubscriptionProvider};
+use crate::{NetworkState, NetworkStatus};
 use log::{debug, info};
 use std::collections::BTreeMap;
 use std::rc::Rc;
@@ -7,13 +13,6 @@ use yew::{
     classes, function_component, html, html::Scope, platform::time::sleep, AttrValue, Callback,
     Component, Context, ContextProvider, Html, Properties,
 };
-
-use crate::block::{Block, BlockNumber, BlockView, Corespace};
-use crate::buttons::{ActionButton, BlockViewButton, NetworkButton};
-use crate::core::{Core, CoreView};
-use crate::runtimes::support::SupportedRuntime;
-use crate::subscription_provider::{SubscriptionId, SubscriptionProvider};
-use crate::{NetworkState, NetworkStatus};
 
 const SIX_SECS: Duration = Duration::from_secs(6);
 
@@ -47,6 +46,7 @@ pub struct App {
     core_view: CoreView,
     match_block: Option<Block>,
     matches: BTreeMap<H256, u32>,
+    last_block: Option<Block>,
     game_status: GameStatus,
     duration: u32,
     points: u32,
@@ -62,7 +62,7 @@ impl Component for App {
 
     fn create(ctx: &Context<Self>) -> Self {
         // Set default runtime as Polkadot
-        let runtime = SupportedRuntime::Kusama;
+        let runtime = SupportedRuntime::Polkadot;
         let runtime_callback = ctx.link().callback(Msg::NetworkDataReceived);
         let subscription_callback = ctx.link().callback(Msg::NetworkSubscriptionCreated);
         // Initialized shared state
@@ -81,6 +81,7 @@ impl Component for App {
             core_view: CoreView::Binary,
             match_block: None,
             matches: BTreeMap::new(),
+            last_block: None,
             game_status: GameStatus::Standby,
             duration: 0,
             points: 0,
@@ -189,6 +190,9 @@ impl Component for App {
                                     self.match_failed();
                                     // verify if game is over
                                     if self.is_game_over() {
+                                        if let Some(head) = self.blocks.get(0) {
+                                            self.last_block = (*head).clone();
+                                        }
                                         ctx.link().send_message(Msg::GameFinished);
                                     }
                                 }
@@ -298,9 +302,16 @@ impl App {
     }
 
     fn game_over_view(&self, link: &Scope<Self>) -> Html {
+        let play_again_onclick = link.callback(move |_| Msg::StartButtonClicked);
+        let data = self.share_message().unwrap_or_default();
         html! {
             <div class="game-over">
                 <h4>{"Game Over"}</h4>
+                <div></div>
+                <div class="action">
+                    <ActionButton label={"▶ play again"} disable={false} onclick={play_again_onclick} />
+                    <ShareButton label={"↱ share"} {data} />
+                </div>
             </div>
         }
     }
@@ -395,7 +406,7 @@ impl App {
                     <td class="help-on">{self.help_duration}</td>
                     <td class="action">
                         <ActionButton label={"▶ start"} disable={self.is_game_on()} onclick={start_onclick} />
-                        <ActionButton label={"▶ helps"}
+                        <ActionButton label={"■□ helps"}
                             disable={!self.is_game_on() || self.is_help_on || self.help_duration == 0} onclick={help_onclick} />
                     </td>
                 </tr>
@@ -408,7 +419,7 @@ impl App {
             <th class="message">
                 { if self.is_game_on() { html! { <div class="game-on">{"It's ON!"}</div> } }
                   else {
-                    html! { <div>{"Play COREMATCH!"}</div> }
+                    html! { <div>{"Play Corematch!"}</div> }
                   }
                 }
             </th>
@@ -419,7 +430,7 @@ impl App {
         html! {
             <footer class="footer">
                 <div class="footer-content">
-                    <div class="caption">{"COREMATCH // Built by TurboFlakes // Unstoppable by Polkadot"}</div>
+                    <div class="caption">{"■□ Corematch // Built by Turboflakes // Unstoppable by Polkadot"}</div>
                     <div class="caption">{"© 2023 TurboFlakes"}</div>
                 </div>
                 <div class="footer-icons">
@@ -515,6 +526,20 @@ impl App {
                 self.is_help_on = false;
                 self.is_help_disabled = true;
             }
+        }
+    }
+
+    fn share_message(&self) -> Option<AttrValue> {
+        if let Some(block) = &self.last_block {
+            let mut data = Vec::new();
+            data.push(format!(
+                "■□ Corematch {}/{}/{}\n",
+                self.points, self.duration, block.block_number
+            ));
+            data.push(block.runtime.hashtag());
+            Some(data.join("\n").into())
+        } else {
+            None
         }
     }
 }

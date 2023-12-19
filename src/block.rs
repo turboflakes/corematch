@@ -8,7 +8,7 @@ use std::str::FromStr;
 use subxt::utils::H256;
 use yew::{
     classes, function_component, html, use_state, AttrValue, Callback, Component, Context,
-    ContextProvider, Html, MouseEvent, Properties,
+    ContextProvider, Html, MouseEvent, Properties, ToHtml,
 };
 
 pub type Corespace = Vec<Core>;
@@ -34,6 +34,12 @@ impl std::fmt::Display for BlockView {
             Self::Cores => write!(f, "core usage"),
             Self::Palette => write!(f, "block palette"),
         }
+    }
+}
+
+impl ToHtml for BlockView {
+    fn to_html(&self) -> Html {
+        html! { self.to_owned() }
     }
 }
 
@@ -154,6 +160,24 @@ impl Block {
             .count();
 
         filled * 100 / self.corespace.len()
+    }
+
+    pub fn corespace_ascii(&self) -> String {
+        self.corespace
+            .iter()
+            .enumerate()
+            .map(|(i, core)| {
+                let mut char = if core.para_id.is_some() {
+                    "■".to_string()
+                } else {
+                    "□".to_string()
+                };
+                if (i as u32 + 1) % self.runtime.columns_size() == 0 {
+                    char.push_str("\n");
+                }
+                char
+            })
+            .collect::<String>()
     }
 
     pub fn render(

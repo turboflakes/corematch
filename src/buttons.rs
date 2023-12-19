@@ -1,6 +1,7 @@
 use crate::block::BlockView;
 use crate::runtimes::support::SupportedRuntime;
-use yew::{classes, function_component, html, AttrValue, Callback, Html, Properties};
+use yew::{classes, function_component, html, use_state, AttrValue, Callback, Html, Properties};
+use yew_hooks::use_clipboard;
 
 #[derive(Properties, PartialEq)]
 pub struct ActionButtonProps {
@@ -21,6 +22,34 @@ pub fn button(props: &ActionButtonProps) -> Html {
     html! {
         <div class={classes!("control")}>
             <div class={classes!("btn-link", disabled_class)} {onclick} >{format!("{}", props.label.to_string())}</div>
+        </div>
+    }
+}
+
+#[derive(Properties, PartialEq)]
+pub struct ShareButtonProps {
+    pub label: AttrValue,
+    pub data: AttrValue,
+}
+
+#[function_component(ShareButton)]
+pub fn button(props: &ShareButtonProps) -> Html {
+    let visible_class = use_state(|| None);
+    let clipboard = use_clipboard();
+    let onclick = {
+        let clipboard = clipboard.clone();
+        let visible_class = visible_class.clone();
+        let data = props.data.clone();
+        Callback::from(move |_| {
+            clipboard.write_text(data.to_string());
+            visible_class.set(Some("visible"))
+        })
+    };
+
+    html! {
+        <div class="share">
+            <ActionButton label={props.label.clone()} disable={false} {onclick} />
+            <span class={classes!("action-msg", *visible_class)}>{"copied scores to clipboard"}</span>
         </div>
     }
 }
