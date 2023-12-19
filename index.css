@@ -1,8 +1,7 @@
 html {
-  /* background: linear-gradient(180deg,#FFFFFF,rgb(230 234 246 / 1)); */
-  background: linear-gradient(180deg,#FFFFFF,#F1F1F0);
-  background: -moz-linear-gradient(180deg,#FFFFFF,#F1F1F0);
-  background: -webkit-linear-gradient(180deg,#FFFFFF,#F1F1F0);
+  background: linear-gradient(270deg,#FFFFFF,rgb(230 234 246));
+  background: -moz-linear-gradient(270deg,#FFFFFF,rgb(230 234 246));
+  background: -webkit-linear-gradient(270deg,#FFFFFF,rgb(230 234 246));
 }
 
 @font-face {

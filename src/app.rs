@@ -14,7 +14,10 @@ use yew::{
     Component, Context, ContextProvider, Html, Properties,
 };
 
-const SIX_SECS: Duration = Duration::from_secs(6);
+const DEFAULT_INITIAL_POINTS: u32 = 0;
+const DEFAULT_INITIAL_DURATION: u32 = 0;
+const DEFAULT_INITIAL_TRIES: u32 = 4;
+const DEFAULT_INITIAL_HELPS: u32 = 16;
 
 #[derive(Clone, PartialEq)]
 pub enum GameStatus {
@@ -83,12 +86,12 @@ impl Component for App {
             matches: BTreeMap::new(),
             last_block: None,
             game_status: GameStatus::Standby,
-            duration: 0,
-            points: 0,
-            tries: 6,
+            duration: DEFAULT_INITIAL_DURATION,
+            points: DEFAULT_INITIAL_POINTS,
+            tries: DEFAULT_INITIAL_TRIES,
             is_help_on: false,
             is_help_disabled: false,
-            help_duration: 16,
+            help_duration: DEFAULT_INITIAL_HELPS,
         }
     }
 
@@ -154,7 +157,6 @@ impl Component for App {
                             for opt in self.blocks.iter_mut() {
                                 if let Some(block) = opt {
                                     if *hash == block.corespace_hash(self.core_view.clone()) {
-                                        info!("HELP");
                                         if block.is_help_available() {
                                             block.help();
                                         }
@@ -240,6 +242,7 @@ impl Component for App {
             }
             Msg::GameFinished => {
                 info!("** Game Over **");
+                info!("\n{}", self.share_message().unwrap_or_default());
                 // reset the current selected match block
                 if let Some(match_block) = &self.match_block {
                     if let Some(i) = self.blocks.iter().position(|opt| {
@@ -454,12 +457,12 @@ impl App {
         self.match_block = None;
         self.matches = BTreeMap::new();
         self.game_status = GameStatus::Standby;
-        self.duration = 0;
-        self.points = 0;
-        self.tries = 6;
+        self.duration = DEFAULT_INITIAL_DURATION;
+        self.points = DEFAULT_INITIAL_POINTS;
+        self.tries = DEFAULT_INITIAL_TRIES;
         self.is_help_on = false;
         self.is_help_disabled = false;
-        self.help_duration = 16;
+        self.help_duration = DEFAULT_INITIAL_HELPS;
     }
 
     fn is_game_on(&self) -> bool {
@@ -533,7 +536,7 @@ impl App {
         if let Some(block) = &self.last_block {
             let mut data = Vec::new();
             data.push(format!(
-                "■□ Corematch {}/{}/{}\n",
+                "■□ corematch.io {}/{}/{}\n",
                 self.points, self.duration, block.block_number
             ));
             data.push(block.runtime.hashtag());
