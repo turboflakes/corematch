@@ -102,6 +102,7 @@ impl Component for App {
                     let network_state = Rc::make_mut(&mut self.network_state);
                     network_state.status = NetworkStatus::Switching;
                     network_state.runtime = SupportedRuntime::from(network);
+                    self.game_status = GameStatus::Resetting;
                 }
             }
             Msg::NetworkSubscriptionCreated(subscription_id) => {
@@ -293,6 +294,7 @@ impl App {
                         { self.network_menu_view(link) }
                         {
                             match self.game_status {
+                                GameStatus::Resetting => { html! {  self.game_resetting_view(link) } }
                                 GameStatus::Over => { html! {  self.game_over_view(link) } }
                                 _ => { self.board_view(link) }
                             }
@@ -304,13 +306,20 @@ impl App {
         }
     }
 
+    fn game_resetting_view(&self, _link: &Scope<Self>) -> Html {
+        html! {
+            <div class="game-resetting">
+                <h4>{"loading..."}</h4>
+            </div>
+        }
+    }
+
     fn game_over_view(&self, link: &Scope<Self>) -> Html {
         let play_again_onclick = link.callback(move |_| Msg::StartButtonClicked);
         let data = self.share_message().unwrap_or_default();
         html! {
             <div class="game-over">
                 <h4>{"Game Over"}</h4>
-                <div></div>
                 <div class="action">
                     <ActionButton label={"▶ play again"} disable={false} onclick={play_again_onclick} />
                     <ShareButton label={"↱ share"} {data} />
