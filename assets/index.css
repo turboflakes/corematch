@@ -1,7 +1,7 @@
 @font-face {
   font-family: 'Pixel Operator Mono HB8';
   src: local('Pixel Operator Mono HB8'), local('Pixel Operator Mono HB8'),
-      url('/assets/fonts/PixelOperator/PixelOperatorMonoHB8.ttf') format('truetype');
+      url('/fonts/PixelOperator/PixelOperatorMonoHB8.ttf') format('truetype');
   font-weight: 800;
   font-style: normal;
 }
@@ -9,7 +9,7 @@
 @font-face {
   font-family: 'Pixel Operator';
   src: local('Pixel Operator'), local('Pixel Operator'),
-      url('/assets/fonts/PixelOperator/PixelOperator.ttf') format('truetype');
+      url('/fonts/PixelOperator/PixelOperator.ttf') format('truetype');
   font-weight: 600;
   font-style: normal;
 }
@@ -182,10 +182,6 @@ footer {
 
 .btn-link:first-child {
   margin-right: 0;
-}
-
-.btn-link:last-child {
-  /* margin-left: 0; */
 }
 
 .game-controls {

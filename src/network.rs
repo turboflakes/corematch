@@ -1,16 +1,7 @@
-use app::App;
-use block::Block;
-use runtimes::support::SupportedRuntime;
-use subscription_provider::SubscriptionId;
-use wasm_bindgen::prelude::*;
+use crate::block::Block;
+use crate::runtimes::support::SupportedRuntime;
+use crate::subscription_provider::SubscriptionId;
 use yew::Callback;
-
-mod app;
-mod block;
-mod buttons;
-mod core;
-mod runtimes;
-mod subscription_provider;
 
 #[derive(Clone, PartialEq)]
 pub enum NetworkStatus {
@@ -24,15 +15,15 @@ pub enum NetworkStatus {
 #[derive(Clone, PartialEq)]
 pub struct NetworkState {
     /// The status of the network.
-    status: NetworkStatus,
+    pub status: NetworkStatus,
     /// Counter to keep track of subscriptions.
-    subscription_id: Option<SubscriptionId>,
+    pub subscription_id: Option<SubscriptionId>,
     // A subscription callback to handle subscription changes.
-    subscription_callback: Callback<SubscriptionId>,
+    pub subscription_callback: Callback<SubscriptionId>,
     /// A runtime supported by the App.
-    runtime: SupportedRuntime,
+    pub runtime: SupportedRuntime,
     // A runtime callback to handle data subscribed by the runtime.
-    runtime_callback: Callback<(SubscriptionId, Block)>,
+    pub runtime_callback: Callback<(SubscriptionId, Block)>,
 }
 
 impl NetworkState {
@@ -51,11 +42,4 @@ impl NetworkState {
             false
         }
     }
-}
-
-#[wasm_bindgen]
-/// init and start component on given root html element
-pub fn init_app(root: web_sys::Element) {
-    wasm_logger::init(wasm_logger::Config::default());
-    yew::Renderer::<App>::with_root(root).render();
 }

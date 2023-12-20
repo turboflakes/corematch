@@ -1,6 +1,6 @@
 use crate::block::{Block, Corespace};
-use crate::NetworkState;
-use crate::SupportedRuntime;
+use crate::network::NetworkState;
+use crate::runtimes::support::SupportedRuntime;
 use anyhow::anyhow;
 use futures::FutureExt;
 use log::{error, info};
@@ -11,7 +11,7 @@ use yew::{
     Context, ContextHandle, Html, Properties,
 };
 
-use crate::runtimes::{kusama, polkadot};
+use crate::runtimes::{polkadot};
 
 pub const STOP_SIGNAL: &str = "stop";
 pub const CONTINUE_SIGNAL: &str = "continue";
@@ -94,21 +94,21 @@ impl Component for SubscriptionProvider {
                             },
                         ),
                     ),
-                    SupportedRuntime::Kusama => {
-                        ctx.link()
-                            .send_future(kusama::subscribe_to_finalized_blocks(api, cb).map(
-                                |result| match result {
-                                    Ok((subscription_id, subscription_channel)) => {
-                                        Msg::SubscriptionCreated((
-                                            subscription_id,
-                                            subscription_channel,
-                                        ))
-                                    }
-                                    Err(err) => Msg::Error(err.into()),
-                                },
-                            ))
-                    } 
-                    // _ => unimplemented!(),
+                    // SupportedRuntime::Kusama => {
+                    //     ctx.link()
+                    //         .send_future(kusama::subscribe_to_finalized_blocks(api, cb).map(
+                    //             |result| match result {
+                    //                 Ok((subscription_id, subscription_channel)) => {
+                    //                     Msg::SubscriptionCreated((
+                    //                         subscription_id,
+                    //                         subscription_channel,
+                    //                     ))
+                    //                 }
+                    //                 Err(err) => Msg::Error(err.into()),
+                    //             },
+                    //         ))
+                    // } 
+                    _ => unimplemented!(),
                 };
                 true
             }

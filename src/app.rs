@@ -1,9 +1,9 @@
 use crate::block::{Block, BlockNumber, BlockView, Corespace};
-use crate::buttons::{ActionButton, BlockViewButton, NetworkButton, ShareButton, InfoButton};
+use crate::buttons::{ActionButton, BlockViewButton, InfoButton, NetworkButton, ShareButton};
 use crate::core::{Core, CoreView};
+use crate::network::{NetworkState, NetworkStatus};
 use crate::runtimes::support::SupportedRuntime;
 use crate::subscription_provider::{SubscriptionId, SubscriptionProvider};
-use crate::{NetworkState, NetworkStatus};
 use log::{debug, info};
 use std::collections::BTreeMap;
 use std::rc::Rc;
@@ -286,26 +286,32 @@ impl App {
     fn game_view(&self, link: &Scope<Self>) -> Html {
         html! {
             <>
-                <div class="content-stats">
-                    { self.game_stats_view(link) }
-                </div>
-                <div class="content-wrapper">
-                    <div class="content-menu">
-                        { self.head_left_view(link) }
-                        { self.head_right_view(link) }
+                <div class="container">
+                    <div class="header">
+                        <h1 class="title">{"COREMATCH"}</h1>
+                        <div class="subtitle">{"The Polkadot Matching Game"}</div>
                     </div>
-                    <div class="content-body">
-                        { self.right_menu_view(link) }
-                        { self.info_view(link) }
-                        {
-                            match self.game_status {
-                                GameStatus::Resetting => { html! {  self.game_resetting_view(link) } }
-                                GameStatus::Over => { html! {  self.game_over_view(link) } }
-                                _ => { self.board_view(link) }
+                    <div class="content-stats">
+                        { self.game_stats_view(link) }
+                    </div>
+                    <div class="content-wrapper">
+                        <div class="content-menu">
+                            { self.head_left_view(link) }
+                            { self.head_right_view(link) }
+                        </div>
+                        <div class="content-body">
+                            { self.right_menu_view(link) }
+                            { self.info_view(link) }
+                            {
+                                match self.game_status {
+                                    GameStatus::Resetting => { html! {  self.game_resetting_view(link) } }
+                                    GameStatus::Over => { html! {  self.game_over_view(link) } }
+                                    _ => { self.board_view(link) }
+                                }
                             }
-                        }
+                        </div>
+                        { self.footer_view() }
                     </div>
-                    { self.footer_view() }
                 </div>
             </>
         }
@@ -356,14 +362,14 @@ impl App {
             SupportedRuntime::Polkadot => {
                 html! {
                     <a class="logo-network" href="https://polkadot.network" target="_blank">
-                        <img class="icon-img" src="/assets/Polkadot_Logo_Horizontal_Pink-Black.svg" alt="polkadot logo" />
+                        <img class="icon-img" src="/images/Polkadot_Logo_Horizontal_Pink-Black.svg" alt="polkadot logo" />
                     </a>
                 }
             }
             SupportedRuntime::Kusama => {
                 html! {
                     <a class="logo-network" href="https://kusama.network" target="_blank">
-                        <img class="icon-img" src="/assets/KUSAMA_6.svg" alt="kusama logo" />
+                        <img class="icon-img" src="/images/KUSAMA_6.svg" alt="kusama logo" />
                     </a>
                 }
             }
@@ -373,7 +379,7 @@ impl App {
     fn head_right_view(&self, link: &Scope<Self>) -> Html {
         let option_click = link.callback(move |e| Msg::BlockViewClicked(e));
         let info_click = link.callback(move |_| Msg::InfoButtonClicked);
-        
+
         html! {
             <div class="top-right-options">
                 <BlockViewButton view={BlockView::Cores}
@@ -390,7 +396,7 @@ impl App {
     fn right_menu_view(&self, link: &Scope<Self>) -> Html {
         let network_state = self.network_state.clone();
         let network_onclick = link.callback(move |e| Msg::NetworkButtonClicked(e));
-        
+
         let visible = self.network_state.is_active();
 
         html! {
@@ -420,7 +426,7 @@ impl App {
                 <h6>{"What is this?"}</h6>
                 <p>{"Corematch is a memory game where the player has to match the latest Polkadot (or Kusama) corespace usage in a 4x4 matrix."}</p>
                 <h6>{"What are the rules?"}</h6>
-                <p>{"The rules are straightforward: with every finalized block, the corespace usage is unveiled and displayed. 
+                <p>{"The rules are straightforward: with every finalized block, the corespace usage is unveiled and displayed.
                 Your mission is to earn points by spotting a matching pattern from the preceding blocks. Be careful though - a wrong block selection results in the loss of a try. 
                 The game kicks of when you press '▶ start' and concludes when you exhaust all available tries."}</p>
                 <p>{"When the game is over, share your results with friends and family. Challenge them to join you in the Corematch game and embark on a quest for the highest score."}</p>
@@ -478,10 +484,10 @@ impl App {
                 </div>
                 <div class="footer-icons">
                     <a class="logo" href="https://turboflakes.io" target="_blank">
-                        <img class="icon-img" src="/assets/logo_mark_black_subtract_turboflakes_.svg" alt="turboflakes logo" />
+                        <img class="icon-img" src="/images/logo_mark_black_subtract_turboflakes_.svg" alt="turboflakes logo" />
                     </a>
                     <a class="logo" href="https://github.com/turboflakes/corematch" target="_blank">
-                        <img class="icon-img" src="/assets/github.svg" alt="github logo" />
+                        <img class="icon-img" src="/images/github.svg" alt="github logo" />
                     </a>
                 </div>
             </footer>
