@@ -1,7 +1,15 @@
 use crate::block::Block;
-use crate::runtimes::support::SupportedRuntime;
+use crate::runtimes::support::SupportedRelayRuntime;
 use crate::subscription_provider::SubscriptionId;
+use log::info;
+use rand::Rng;
+use std::collections::BTreeMap;
 use yew::Callback;
+pub type ParaId = u32;
+// Color is define in HSL format
+pub type Color = (u32, u32, u32);
+pub type ParachainIds = Vec<ParaId>;
+pub type ParachainColors = BTreeMap<ParaId, Color>;
 
 #[derive(Clone, PartialEq)]
 pub enum NetworkStatus {
@@ -21,18 +29,43 @@ pub struct NetworkState {
     // A subscription callback to handle subscription changes.
     pub subscription_callback: Callback<SubscriptionId>,
     /// A runtime supported by the App.
-    pub runtime: SupportedRuntime,
+    pub runtime: SupportedRelayRuntime,
     // A runtime callback to handle data subscribed by the runtime.
     pub runtime_callback: Callback<(SubscriptionId, Block)>,
+    /// A map between parachain_id and color.
+    pub parachain_colors: ParachainColors,
+    // A parachains callback to handle data collected.
+    pub parachains_callback: Callback<ParachainIds>,
 }
 
 impl NetworkState {
+    pub fn new(
+        runtime: SupportedRelayRuntime,
+        runtime_callback: Callback<(SubscriptionId, Block)>,
+        subscription_callback: Callback<SubscriptionId>,
+        parachains_callback: Callback<ParachainIds>,
+    ) -> Self {
+        Self {
+            status: NetworkStatus::Initializing,
+            subscription_id: None,
+            subscription_callback,
+            runtime,
+            runtime_callback,
+            parachain_colors: BTreeMap::new(),
+            parachains_callback,
+        }
+    }
+
     pub fn is_initializing(&self) -> bool {
         self.status == NetworkStatus::Initializing
     }
 
     pub fn is_active(&self) -> bool {
         self.status == NetworkStatus::Active
+    }
+
+    pub fn is_switching(&self) -> bool {
+        self.status == NetworkStatus::Switching
     }
 
     pub fn is_valid(&self, id: SubscriptionId) -> bool {
@@ -42,4 +75,35 @@ impl NetworkState {
             false
         }
     }
+}
+
+pub fn generate_parachain_colors(para_ids: ParachainIds) -> ParachainColors {
+    let n: u32 = para_ids.len().try_into().unwrap();
+
+    // generate colors
+    let mut colors = Vec::<Color>::new();
+    for i in 0..n {
+        let hue = 360 / n * i as u32;
+        colors.push((hue, 96_u32, 68_u32));
+    }
+
+    // pick a random color and assign it a para_id
+    let mut rng = rand::thread_rng();
+    para_ids
+        .into_iter()
+        .map(|para_id| {
+            let i = rng.gen_range(0..colors.len());
+            let color = colors.remove(i);
+            (para_id, color)
+        })
+        .collect()
+
+    // para_ids
+    //     .into_iter()
+    //     .enumerate()
+    //     .map(|(i, para_id)| {
+    //         let hue = 360 / n * i as u32;
+    //         (para_id, (hue, 95_u32, 72_u32))
+    //     })
+    //     .collect()
 }

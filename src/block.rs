@@ -1,6 +1,7 @@
+use crate::app::GameLevel;
 use crate::{
-    core::{Core, CoreView},
-    runtimes::support::SupportedRuntime,
+    core::{Core, CoreView, NaCoreComponent},
+    runtimes::support::SupportedRelayRuntime,
 };
 use futures::io::Empty;
 use log::{error, info};
@@ -19,7 +20,7 @@ pub type BlockNumber = u32;
 pub enum Status {
     Matched,
     Selected,
-    Revealed,
+    None,
 }
 
 #[derive(Clone, PartialEq)]
@@ -47,41 +48,75 @@ impl ToHtml for BlockView {
 pub struct Block {
     pub block_number: BlockNumber,
     pub corespace: Corespace,
-    pub runtime: SupportedRuntime,
-    pub status: Status,
+    pub runtime: SupportedRelayRuntime,
+    pub selected_class: Option<String>,
+    pub disable_class: Option<String>,
     pub missed_class: Option<String>,
     pub matched_class: Option<String>,
     pub help_class: Option<String>,
+    pub is_selected: bool,
 }
 
 impl Block {
-    pub fn new(block_number: BlockNumber, corespace: Corespace, runtime: SupportedRuntime) -> Self {
+    pub fn new(
+        block_number: BlockNumber,
+        corespace: Corespace,
+        runtime: SupportedRelayRuntime,
+    ) -> Self {
         Self {
             block_number,
             corespace,
             runtime,
-            status: Status::Revealed,
+            selected_class: None,
+            disable_class: None,
             missed_class: None,
             matched_class: None,
             help_class: None,
+            is_selected: false,
         }
     }
 
-    pub fn clicked(&mut self) {
-        self.status = match self.status {
-            Status::Revealed => Status::Selected,
-            Status::Selected => Status::Revealed,
-            _ => return,
-        };
+    pub fn selected(&mut self) {
+        self.selected_class = Some("highlight".to_string());
+    }
+
+    pub fn unselected(&mut self) {
+        self.selected_class = None;
+    }
+
+    pub fn is_selected(&self) -> bool {
+        self.selected_class.is_some()
     }
 
     pub fn matched(&mut self) {
-        self.status = Status::Matched;
         self.matched_class = Some("matched".to_string());
+        self.help_class = None;
+    }
+
+    pub fn is_matched(&self) -> bool {
+        self.matched_class.is_some()
+    }
+
+    pub fn disabled(&mut self) {
+        self.matched_class = None;
+        self.disable_class = Some("disabled".to_string());
+    }
+
+    pub fn is_disabled(&self) -> bool {
+        self.disable_class.is_some()
     }
 
     pub fn missed(&mut self) {
         self.missed_class = Some("missed".to_string());
+    }
+
+    pub fn cleared(&mut self) {
+        self.missed_class = None;
+        self.help_class = None;
+    }
+
+    pub fn is_help_available(&self) -> bool {
+        self.matched_class.is_none()
     }
 
     pub fn help(&mut self) {
@@ -94,61 +129,69 @@ impl Block {
 
     pub fn inline_style(&self) -> String {
         match self.runtime {
-            SupportedRuntime::Polkadot => format!(
+            SupportedRelayRuntime::Polkadot => format!(
                 "background-color: rgba(230, 0, 122, {});",
                 self.corespace_usage() as f32 / 100.0
             ),
-            SupportedRuntime::Kusama => format!(
+            SupportedRelayRuntime::Kusama => format!(
                 "background-color: rgba(0, 0, 0, {});",
                 self.corespace_usage() as f32 / 100.0
             ),
         }
     }
 
+    pub fn reset(&mut self) {
+        self.reset_class();
+    }
+
     pub fn reset_class(&mut self) {
+        self.selected_class = None;
+        self.disable_class = None;
         self.missed_class = None;
         self.matched_class = None;
         self.help_class = None;
     }
 
     pub fn classes(&self) -> String {
-        match self.status {
-            Status::Revealed => "".to_string(),
-            Status::Selected => "highlight".to_string(),
-            Status::Matched => "disable".to_string(),
-        }
+        classes!(
+            self.network_class(),
+            self.selected_class.clone(),
+            self.disable_class.clone(),
+            self.missed_class.clone(),
+            self.matched_class.clone(),
+            self.help_class.clone()
+        )
+        .to_string()
     }
 
-    pub fn is_help_available(&self) -> bool {
-        self.status == Status::Revealed
-    }
-
-    pub fn is_matched(&self) -> bool {
-        self.status == Status::Matched
-    }
-
-    pub fn corespace_hash(&self, view: CoreView) -> H256 {
-        let data = self
-            .corespace
-            .iter()
-            .map(|core| match view {
-                CoreView::Binary => {
+    pub fn corespace_hash(&self, game_level: GameLevel) -> H256 {
+        let data: Vec<u8> = match game_level {
+            // GameLevel::Level0 => (self.corespace_usage() as u32).to_le_bytes().to_vec(),
+            GameLevel::Level1 => self
+                .corespace
+                .iter()
+                .map(|core| {
                     if core.para_id.is_some() {
-                        "1".to_string()
+                        0x01u8
                     } else {
-                        "0".to_string()
+                        0x00u8
                     }
-                }
-                CoreView::Multi => {
+                })
+                .collect::<Vec<u8>>(),
+            GameLevel::Level2 => self
+                .corespace
+                .iter()
+                .map(|core| {
                     if let Some(para_id) = core.para_id {
-                        para_id.to_string()
+                        para_id.to_le_bytes()
                     } else {
-                        "0".to_string()
+                        0x00u32.to_le_bytes()
                     }
-                }
-            })
-            .collect::<String>();
-        let hash = sp_core_hashing::blake2_256(data.as_bytes());
+                })
+                .flatten()
+                .collect::<Vec<u8>>(),
+        };
+        let hash = sp_core_hashing::blake2_256(&data[..]);
         H256::from(&hash)
     }
 
@@ -185,9 +228,10 @@ impl Block {
         block_view: BlockView,
         core_view: CoreView,
         onclick: Callback<()>,
+        ondblclick: Callback<()>,
         onanimationend: Callback<BlockNumber>,
     ) -> Html {
-        html! { <BlockComponent block={self.clone()} {block_view} {core_view} {onclick} {onanimationend} /> }
+        html! { <BlockComponent block={self.clone()} {block_view} {core_view} {onclick} {ondblclick} {onanimationend} /> }
     }
 }
 
@@ -197,34 +241,48 @@ pub struct Props {
     pub block_view: BlockView,
     pub core_view: CoreView,
     pub onclick: Callback<()>,
+    pub ondblclick: Callback<()>,
     pub onanimationend: Callback<BlockNumber>,
 }
 
 #[function_component(BlockComponent)]
 pub fn block(props: &Props) -> Html {
     let onclick = props.onclick.reform(move |_| ());
+    let ondblclick = props.ondblclick.reform(move |_| ());
     let block_number = props.block.block_number.clone();
     let onanimationend = props.onanimationend.reform(move |_| block_number.clone());
 
+    let not_available_cores_counter = (props.block.runtime.columns_size()
+        * props.block.runtime.columns_size())
+        - props.block.corespace.len() as u32;
+    let not_available_vec = vec![0; not_available_cores_counter.try_into().unwrap()];
+
     html! {
-        <div class={classes!("corespace", props.block.network_class(), props.block.classes(),
-            props.block.missed_class.clone(), props.block.matched_class.clone(),
-            props.block.help_class.clone())}
-            {onclick} {onanimationend}>
+        <div class={classes!("corespace", props.block.classes())}
+            {onclick} {ondblclick} {onanimationend}>
             {
                 match props.block_view {
                     BlockView::Cores => {
-                        html! { for props.block.corespace.iter().map(|c| c.render(props.core_view.clone())) }
+                        html! {
+                            <>
+                            { for props.block.corespace.iter().map(|c| c.render(props.core_view.clone())) }
+                            { for not_available_vec.iter().map(|_| html! { <NaCoreComponent /> } ) }
+                            </>
+                        }
                     }
                     BlockView::Palette => {
-                        let label = format!(
-                            "#{} / {}%",
-                            props.block.block_number.clone(),
+                        let core_usage = format!(
+                            "{}%",
                             props.block.corespace_usage()
                         );
+                        let block_number = format!(
+                            "#{}",
+                            props.block.block_number.clone(),
+                        );
                         html! {
-                            <div class="corespace-palette" style={props.block.inline_style()}>
-                                <span class="label">{ label }</span>
+                            <div class={classes!("palette")} style={props.block.inline_style()}>
+                                <h6 class="usage">{ core_usage }</h6>
+                                <span class="block_number">{ block_number }</span>
                             </div>
                         }
                     }

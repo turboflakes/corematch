@@ -1,6 +1,6 @@
 use crate::block::{Block, Corespace};
 use crate::core::Core;
-use crate::runtimes::support::SupportedRuntime;
+use crate::runtimes::support::SupportedRelayRuntime;
 use futures::StreamExt;
 use log::{error, info};
 use node_runtime::runtime_types::{
@@ -35,7 +35,6 @@ pub async fn subscribe_to_finalized_blocks(
     // Generate a unique subscription_id
     let mut rng = rand::thread_rng();
     let subscription_id = rng.gen::<u32>();
-
     spawn_local(async move {
         // set number of previous blocks to be fetched
         let mut previous_blocks_processed: Option<_> = Some(DEFAULT_TOTAL_BLOCKS);
@@ -145,8 +144,29 @@ pub async fn fetch_corespace(
         return Ok(Block::new(
             block_number.clone(),
             corespace.clone(),
-            SupportedRuntime::Polkadot,
+            SupportedRelayRuntime::Polkadot,
         ));
     }
     Err(format!("Failed to fetch availability_cores for block_hash: {block_hash}").into())
+}
+
+pub async fn fetch_parachains(api: OnlineClient<PolkadotConfig>) -> Result<Vec<u32>, subxt::Error> {
+    let parachains_addr = node_runtime::storage().paras().parachains();
+
+    if let Some(parachains) = api
+        .storage()
+        .at_latest()
+        .await?
+        .fetch(&parachains_addr)
+        .await?
+    {
+        return Ok(parachains
+            .iter()
+            .map(|id| {
+                let Id(para_id) = id;
+                *para_id
+            })
+            .collect::<Vec<u32>>());
+    }
+    Err(format!("Failed to fetch parachains").into())
 }

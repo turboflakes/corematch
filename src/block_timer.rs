@@ -12,6 +12,8 @@ pub enum Msg {
 pub struct Props {
     pub block_number: Option<BlockNumber>,
     pub visible: bool,
+    pub index: usize,
+    pub class: String,
 }
 
 pub struct BlockTimer {
@@ -44,7 +46,7 @@ impl Component for BlockTimer {
         }
     }
 
-    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::Update => {
                 if self.seconds == 0 && self.milliseconds == 0 {
@@ -62,7 +64,7 @@ impl Component for BlockTimer {
         }
     }
 
-    fn changed(&mut self, ctx: &Context<Self>, _old_props: &Self::Properties) -> bool {
+    fn changed(&mut self, _ctx: &Context<Self>, _old_props: &Self::Properties) -> bool {
         self.reset();
         true
     }
@@ -71,12 +73,14 @@ impl Component for BlockTimer {
         let visible_class = if ctx.props().visible {
             Some("visible")
         } else {
-            None
+            Some("hidden")
         };
+        let additional_class = ctx.props().class.clone();
         html! {
-            <div class={classes!("countdown", visible_class)}>
-                <span>{"⤹"}</span>
-                <span>{format!("new block in {}.{} s", self.seconds, self.milliseconds)}</span>
+            <div class={classes!("countdown", visible_class, additional_class)}>
+                { if ctx.props().index < 2 { html! { <span>{"⤹"}</span> } } else { html! {} } }
+                <span>{format!("Match this pattern in {}.{}s", self.seconds, self.milliseconds)}</span>
+                { if ctx.props().index >= 2 { html! { <span>{"⤵"}</span> } } else { html! {} } }
             </div>
         }
     }

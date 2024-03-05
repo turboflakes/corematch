@@ -3,18 +3,16 @@ use yew::AttrValue;
 pub type ChainPrefix = u16;
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
-pub enum SupportedRuntime {
+pub enum SupportedRelayRuntime {
     Polkadot,
     Kusama,
-    // Westend,
 }
 
-impl SupportedRuntime {
+impl SupportedRelayRuntime {
     pub fn _chain_prefix(&self) -> ChainPrefix {
         match &self {
             Self::Polkadot => 0,
             Self::Kusama => 2,
-            // Self::Westend => 42,
         }
     }
 
@@ -22,7 +20,6 @@ impl SupportedRuntime {
         match &self {
             Self::Polkadot => "wss://rpc.ibp.network/polkadot".to_string(),
             Self::Kusama => "wss://rpc.ibp.network/kusama".to_string(),
-            // Self::Westend => "wss://rpc.ibp.network/westend".to_string(),
         }
     }
 
@@ -35,57 +32,81 @@ impl SupportedRuntime {
 
     pub fn hashtag(&self) -> String {
         match &self {
-            Self::Polkadot => "#Polkadot".to_string(),
-            Self::Kusama => "#KusamaNetwork".to_string(),
+            Self::Polkadot => "@Polkadot #BuildOnPolkadot".to_string(),
+            Self::Kusama => "@kusamanetwork #BuildOnKusama".to_string(),
+        }
+    }
+
+    pub fn asset_hub_runtime(&self) -> SupportedParachainRuntime {
+        match &self {
+            Self::Polkadot => SupportedParachainRuntime::AssetHubPolkadot,
+            Self::Kusama => SupportedParachainRuntime::AssetHubKusama,
         }
     }
 }
 
-impl From<AttrValue> for SupportedRuntime {
+impl From<AttrValue> for SupportedRelayRuntime {
     fn from(v: AttrValue) -> Self {
         match v.as_str() {
             "polkadot" => Self::Polkadot,
             "DOT" => Self::Polkadot,
             "kusama" => Self::Kusama,
             "KSM" => Self::Kusama,
-            // "westend" => Self::Westend,
-            // "WND" => Self::Westend,
             _ => unimplemented!("Chain prefix not supported"),
         }
     }
 }
 
-impl From<String> for SupportedRuntime {
+impl From<String> for SupportedRelayRuntime {
     fn from(v: String) -> Self {
         match v.as_str() {
             "polkadot" => Self::Polkadot,
             "DOT" => Self::Polkadot,
             "kusama" => Self::Kusama,
             "KSM" => Self::Kusama,
-            // "westend" => Self::Westend,
-            // "WND" => Self::Westend,
             _ => unimplemented!("Chain prefix not supported"),
         }
     }
 }
 
-impl From<ChainPrefix> for SupportedRuntime {
+impl From<ChainPrefix> for SupportedRelayRuntime {
     fn from(v: ChainPrefix) -> Self {
         match v {
             0 => Self::Polkadot,
             2 => Self::Kusama,
-            // 42 => Self::Westend,
             _ => unimplemented!("Chain prefix not supported"),
         }
     }
 }
 
-impl std::fmt::Display for SupportedRuntime {
+impl std::fmt::Display for SupportedRelayRuntime {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Polkadot => write!(f, "Polkadot"),
             Self::Kusama => write!(f, "Kusama"),
-            // Self::Westend => write!(f, "Westend"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+pub enum SupportedParachainRuntime {
+    AssetHubPolkadot,
+    AssetHubKusama,
+}
+
+impl SupportedParachainRuntime {
+    pub fn default_rpc_url(&self) -> String {
+        match &self {
+            Self::AssetHubPolkadot => "wss://sys.ibp.network/westmint".to_string(),
+            Self::AssetHubKusama => "wss://sys.ibp.network/westmint".to_string(),
+        }
+    }
+}
+impl std::fmt::Display for SupportedParachainRuntime {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::AssetHubPolkadot => write!(f, "AssetHub Polkadot"),
+            Self::AssetHubKusama => write!(f, "AssetHub Polkadot"),
         }
     }
 }

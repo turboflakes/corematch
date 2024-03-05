@@ -1,12 +1,19 @@
+use crate::app::GameLevel;
 use crate::block::BlockView;
-use crate::runtimes::support::SupportedRuntime;
-use yew::{classes, function_component, html, use_state, AttrValue, Callback, Html, Properties};
+use crate::runtimes::support::SupportedRelayRuntime;
+use gloo::timers::callback::Timeout;
+use log::info;
+use yew::{
+    classes, function_component, html, use_state, AttrValue, Callback, Children, FocusEvent, Html,
+    Properties,
+};
 use yew_hooks::use_clipboard;
 
 #[derive(Properties, PartialEq)]
 pub struct ActionButtonProps {
     pub disable: bool,
     pub label: AttrValue,
+    pub children: Children,
     pub onclick: Callback<()>,
 }
 
@@ -21,8 +28,33 @@ pub fn button(props: &ActionButtonProps) -> Html {
 
     html! {
         <div class={classes!("control")}>
-            <div class={classes!("btn-link", disabled_class)} {onclick} >{format!("{}", props.label.to_string())}</div>
+            <button class={classes!("btn__link", disabled_class)} {onclick}>
+                {props.children.clone()}<span class="label">{format!("{}", props.label.to_string())}</span>
+            </button>
         </div>
+    }
+}
+
+#[derive(Properties, PartialEq)]
+pub struct IconButtonProps {
+    pub disable: bool,
+    pub children: Children,
+    pub onclick: Callback<()>,
+}
+
+#[function_component(IconButton)]
+pub fn button(props: &IconButtonProps) -> Html {
+    let onclick = props.onclick.reform(move |_| ());
+    let disabled_class = if props.disable {
+        Some("disabled")
+    } else {
+        None
+    };
+
+    html! {
+        <button disabled={disabled_class.is_some()} class={classes!("btn__icon", disabled_class)} {onclick} >
+            {props.children.clone()}
+        </button>
     }
 }
 
@@ -30,54 +62,75 @@ pub fn button(props: &ActionButtonProps) -> Html {
 pub struct ShareButtonProps {
     pub label: AttrValue,
     pub data: AttrValue,
+    pub children: Children,
 }
 
 #[function_component(ShareButton)]
 pub fn button(props: &ShareButtonProps) -> Html {
-    let visible_class = use_state(|| None);
+    let optional_class = use_state(|| Some("hidden"));
+    let timeout = use_state(|| None);
     let clipboard = use_clipboard();
+
     let onclick = {
         let clipboard = clipboard.clone();
-        let visible_class = visible_class.clone();
+        let optional_class = optional_class.clone();
         let data = props.data.clone();
+        let timeout = timeout.clone();
+
         Callback::from(move |_| {
+            let hidden_class = optional_class.clone();
+            let handle = Timeout::new(3_000, move || hidden_class.set(Some("hidden")));
+            timeout.set(Some(handle));
             clipboard.write_text(data.to_string());
-            visible_class.set(Some("visible"))
+            optional_class.set(Some("visible"))
         })
     };
 
     html! {
         <div class="share">
-            <ActionButton label={props.label.clone()} disable={false} {onclick} />
-            <span class={classes!("action-msg", *visible_class)}>{"results copied to clipboard"}</span>
+            <ActionButton label={props.label.clone()} disable={false} {onclick} >{props.children.clone()}</ActionButton>
+            <span class={classes!("clipboard__message", *optional_class)}>{"results copied to clipboard"}</span>
         </div>
+    }
+}
+
+#[derive(Properties, PartialEq)]
+pub struct MintButtonProps {
+    pub label: AttrValue,
+    pub children: Children,
+    pub onclick: Callback<()>,
+}
+
+#[function_component(MintButton)]
+pub fn button(props: &MintButtonProps) -> Html {
+    let onclick = props.onclick.reform(move |_| ());
+
+    // TODO: MintButton is disabled for the moment
+    html! {
+        <ActionButton label={props.label.clone()} disable={true} {onclick} >{props.children.clone()}</ActionButton>
     }
 }
 
 #[derive(Properties, PartialEq)]
 pub struct NetworkButtonProps {
     pub switch_to: AttrValue,
-    pub visible: bool,
+    pub class: Option<AttrValue>,
+    pub children: Children,
     pub onclick: Callback<AttrValue>,
 }
 
 #[function_component(NetworkButton)]
 pub fn button(props: &NetworkButtonProps) -> Html {
-    if !props.visible {
-        return html! {};
-    }
-
+    let optional_class = props.class.clone();
     let switch_to = props.switch_to.clone();
 
     let onclick = props.onclick.reform(move |_| switch_to.clone());
 
-    let label = format!("switch to {}", props.switch_to.clone());
+    let _label = format!("switch to {}", props.switch_to.clone());
 
     html! {
-        <div class={classes!("btn-network")}>
-
-            <div class={classes!("btn-link")} {onclick} >{ label }</div>
-
+        <div class={classes!("btn__icon", optional_class)} {onclick} >
+            {props.children.clone()}
         </div>
     }
 }
@@ -85,33 +138,51 @@ pub fn button(props: &NetworkButtonProps) -> Html {
 #[derive(Properties, PartialEq)]
 pub struct BlockViewProps {
     pub view: BlockView,
-    pub selected: bool,
+    pub disable: bool,
+    pub children: Children,
     pub onclick: Callback<BlockView>,
 }
 
 #[function_component(BlockViewButton)]
 pub fn button(props: &BlockViewProps) -> Html {
     let view = props.view.clone();
-    let selected_class = if props.selected {
-        Some("selected")
-    } else {
-        None
-    };
     let onclick = props.onclick.reform(move |_| view.clone());
 
     html! {
-        <div class={classes!("btn-link", selected_class)} {onclick}>{ props.view.clone() }</div>
+        <IconButton disable={props.disable.clone()} {onclick}>
+            {props.children.clone()}
+        </IconButton>
     }
 }
 
 #[derive(Properties, PartialEq)]
-pub struct InfoProps {
+pub struct LevelProps {
+    pub level: GameLevel,
+    pub disable: bool,
+    pub children: Children,
+    pub onclick: Callback<GameLevel>,
+}
+
+#[function_component(LevelButton)]
+pub fn button(props: &LevelProps) -> Html {
+    let level = props.level.clone();
+    let onclick = props.onclick.reform(move |_| level.clone());
+
+    html! {
+        <IconButton disable={props.disable.clone()} {onclick}>
+            {props.children.clone()}
+        </IconButton>
+    }
+}
+
+#[derive(Properties, PartialEq)]
+pub struct TextProps {
     pub label: AttrValue,
     pub onclick: Callback<()>,
 }
 
-#[function_component(InfoButton)]
-pub fn button(props: &InfoProps) -> Html {
+#[function_component(TextButton)]
+pub fn button(props: &TextProps) -> Html {
     let onclick = props.onclick.reform(move |_| ());
 
     html! {

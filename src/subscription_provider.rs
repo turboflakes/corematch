@@ -1,6 +1,6 @@
 use crate::block::{Block, Corespace};
-use crate::network::NetworkState;
-use crate::runtimes::support::SupportedRuntime;
+use crate::network::{NetworkState, ParachainIds};
+use crate::runtimes::support::SupportedRelayRuntime;
 use anyhow::anyhow;
 use futures::FutureExt;
 use log::{error, info};
@@ -11,7 +11,7 @@ use yew::{
     Context, ContextHandle, Html, Properties,
 };
 
-use crate::runtimes::{polkadot};
+use crate::runtimes::{kusama, polkadot};
 
 pub const STOP_SIGNAL: &str = "stop";
 pub const CONTINUE_SIGNAL: &str = "continue";
@@ -23,6 +23,7 @@ pub enum Msg {
     OnlineClientCreated(OnlineClient<PolkadotConfig>),
     OnlineClientDataReceived((SubscriptionId, Block)),
     SubscriptionCreated((SubscriptionId, UnboundedSender<AttrValue>)),
+    ParachainsCollected(ParachainIds),
     ContextChanged(Rc<NetworkState>),
 }
 
@@ -50,7 +51,7 @@ impl Component for SubscriptionProvider {
             .context::<Rc<NetworkState>>(ctx.link().callback(Msg::ContextChanged))
             .expect("context to be set");
 
-        let runtime = SupportedRuntime::from(state.runtime.clone());
+        let runtime = SupportedRelayRuntime::from(state.runtime.clone());
         ctx.link().send_future(OnlineClient::<PolkadotConfig>::from_url(runtime.default_rpc_url()).map(|result| {
             match result {
                 Ok(online_client) => Msg::OnlineClientCreated(online_client),
@@ -76,12 +77,37 @@ impl Component for SubscriptionProvider {
             }
             Msg::OnlineClientCreated(online_client) => {
                 self.online_client = Some(online_client);
+
+                // Fetch parachains
+                let api = self.online_client.as_ref().unwrap().clone();
+
+                match self.state.runtime {
+                    SupportedRelayRuntime::Polkadot => {
+                        ctx.link()
+                            .send_future(polkadot::fetch_parachains(api).map(
+                                |result| match result {
+                                    Ok(para_ids) => Msg::ParachainsCollected(para_ids),
+                                    Err(err) => Msg::Error(err.into()),
+                                },
+                            ))
+                    }
+                    SupportedRelayRuntime::Kusama => {
+                        ctx.link()
+                            .send_future(kusama::fetch_parachains(api).map(|result| match result {
+                                Ok(para_ids) => Msg::ParachainsCollected(para_ids),
+                                Err(err) => Msg::Error(err.into()),
+                            }))
+                    }
+                    _ => unimplemented!(),
+                }
+
+                // Subscribe blocks
                 let cb: Callback<(SubscriptionId, Block)> =
                     ctx.link().callback(Msg::OnlineClientDataReceived);
                 let api = self.online_client.as_ref().unwrap().clone();
 
                 match self.state.runtime {
-                    SupportedRuntime::Polkadot => ctx.link().send_future(
+                    SupportedRelayRuntime::Polkadot => ctx.link().send_future(
                         polkadot::subscribe_to_finalized_blocks(api, cb).map(
                             |result| match result {
                                 Ok((subscription_id, subscription_channel)) => {
@@ -94,22 +120,27 @@ impl Component for SubscriptionProvider {
                             },
                         ),
                     ),
-                    // SupportedRuntime::Kusama => {
-                    //     ctx.link()
-                    //         .send_future(kusama::subscribe_to_finalized_blocks(api, cb).map(
-                    //             |result| match result {
-                    //                 Ok((subscription_id, subscription_channel)) => {
-                    //                     Msg::SubscriptionCreated((
-                    //                         subscription_id,
-                    //                         subscription_channel,
-                    //                     ))
-                    //                 }
-                    //                 Err(err) => Msg::Error(err.into()),
-                    //             },
-                    //         ))
-                    // } 
+                    SupportedRelayRuntime::Kusama => {
+                        ctx.link()
+                            .send_future(kusama::subscribe_to_finalized_blocks(api, cb).map(
+                                |result| match result {
+                                    Ok((subscription_id, subscription_channel)) => {
+                                        Msg::SubscriptionCreated((
+                                            subscription_id,
+                                            subscription_channel,
+                                        ))
+                                    }
+                                    Err(err) => Msg::Error(err.into()),
+                                },
+                            ))
+                    }
                     _ => unimplemented!(),
                 };
+                true
+            }
+            Msg::ParachainsCollected(para_ids) => {
+                // send parachains to be processed by the app
+                self.state.parachains_callback.emit(para_ids);
                 true
             }
             Msg::SubscriptionCreated((subscription_id, subscription_channel)) => {
@@ -148,8 +179,7 @@ impl Component for SubscriptionProvider {
                             .expect("failed to send signal");
                     }
                     // Create a new online client
-                    let runtime = SupportedRuntime::from(state.runtime.clone());
-                    ctx.link().send_future(OnlineClient::<PolkadotConfig>::from_url(runtime.default_rpc_url()).map(|result| {
+                    ctx.link().send_future(OnlineClient::<PolkadotConfig>::from_url(state.runtime.default_rpc_url()).map(|result| {
                         match result {
                             Ok(online_client) => Msg::OnlineClientCreated(online_client),
                             Err(err) => Msg::Error(anyhow!("RPC connection could not be established, make sure RPC endpoint is valid:\n{err}")),
