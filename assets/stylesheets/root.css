@@ -12,6 +12,7 @@
   --hsl-green: 164 95 42;
   --hsl-blue: 195 83 38;
   --hsl-yellow: 42 100 70;
+  --hsl-yellow-lighter: 42 100 80;
   --hsl-red: 346 84 61;
   /*  */
   --color-primary: hsl(var(--hsl-900));
@@ -28,6 +29,7 @@
   --color-green: hsl(var(--hsl-green));
   --color-blue: hsl(var(--hsl-blue));
   --color-yellow: hsl(var(--hsl-yellow));
+  --color-yellow-lighter: hsl(var(--hsl-yellow-lighter));
   --color-red: hsl(var(--hsl-red));
   --color-white: hsl(var(--hsl-100));
   /*  */

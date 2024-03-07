@@ -284,7 +284,6 @@ impl Component for App {
                 network_state.parachain_colors = generate_parachain_colors(para_ids.clone());
             }
             Msg::NetworkDataReceived((subscription_id, block)) => {
-
                 // FOR TESTING ONLY -- start
                 // if self.game_status == GameStatus::Minting {
                 //     return true;
@@ -538,7 +537,7 @@ impl Component for App {
                     }
                     SupportedKeys::Space => {
                         if self.is_game_on() {
-                            // TODO: change between levels?
+                            self.show_details()
                         }
                         // TODO: if game over space could be used to restart the game
                         info!("Skip")
@@ -563,6 +562,9 @@ impl Component for App {
                     SupportedKeys::N2 => self.set_match_position(1),
                     SupportedKeys::N3 => self.set_match_position(2),
                     SupportedKeys::N4 => self.set_match_position(3),
+                    SupportedKeys::S => self.start(),
+                    SupportedKeys::H => self.start_help(),
+                    SupportedKeys::F => self.show_details(),
                     _ => info!("Skip"),
                 };
             }
@@ -787,7 +789,6 @@ impl App {
                                     let block_dblclicked = link.callback(move |_| Msg::BlockPressed(i.clone()));
                                     let block_animation_ended = link.callback(move |bn| Msg::BlockAnimationEnded(bn));
                                     block.render(
-                                        self.game_level.block_view(),
                                         self.game_level.core_view(Some(self.network_state.parachain_colors.clone())),
                                         block_clicked.clone(),
                                         block_dblclicked.clone(),
@@ -886,29 +887,28 @@ impl App {
             <div class={classes!("game__about")}>
                 <h6>{"What is this?"}</h6>
                 <p>{"Corematch is a memory game where players must spot a matching pattern to earn points.
-                    To keep things simple let's use the term ― "}<b>{"cell"}</b>{" ― to refer to this pattern."}</p>
-                <p>{"The board game holds a maximum of sixteen cells arranjed in a 4x4 matrix."}</p>
-                <h6>{"How is the pattern of each cell crafted?"}</h6>
-                <p>{"Depending on the selected chain, the pattern is derived from the "}
+                    The board game holds a maximum of sixteen square objects ― "}<b>{"Cells"}</b>{" ― arranjed in a 4x4 matrix."}</p>
+                <h6>{"Where does the pattern come from?"}</h6>
+                <p>{"The pattern is crafted from the Polkadot multi-core architecture. Depending on the selected chain, the pattern reflects the "}
                     <a class="link" href="https://wiki.polkadot.network/docs/polkadot-direction#core-usage-in-polkadot-10" target="_blank">{"core usage"}</a>
                     {" of either Polkadot or Kusama protocol on every finalized block."}
                 </p>
-                <p>{"The cell contains the number of cores available on chain, and each core is colored based on its usage.
-                    In the current version, each core can only exist in two states: empty or full."}</p>
+                <p>{"Each cell represents a finalized block, engraved with the number of cores available on chain, where each core is colored based on its usage.
+                    In the current version - Polkadot v1.0, each core can only exist in two states: empty or full."}</p>
                 <h6>{"What are the game rules?"}</h6>
-                <p>{"The mission is to earn as many points as possible by spotting one or more matches between the predefined cell and the others in 6 seconds. 
+                <p>{"The mission is to earn as many points as possible by spotting one or more matches between the predefined cell and the others in 6 seconds.
                     If there is more than a pair, points are powered up. 
                     However, a wrong cell selection leads to a loss, and the game concludes if you make four incorrect selections."}</p>
                 <h6>{"How to play?"}</h6>
-                <p>{"You can play using either the mouse or the keyboard. If you opt for the mouse, double-click the left mouse button on top of the spotted matching cell. 
+                <p>{"You can play using either the mouse or the keyboard. If you opt for the mouse, double-click the left mouse button on top of the spotted matching cell.
                     Alternatively, if you choose the keyboard, move around the selected cell with the arrow keys and press 'enter' when you spot a matching one."}</p>
-                <p>{"You can start playing by pressing the button "}
+                <p>{"You can start playing by pressing the 'S' key or the button "}
                     <span><img class="icon__img" src="/images/start_icon.svg" alt="start_game" /></span>
-                    {". During gameplay, you can make use of the match button "}
+                    {". During gameplay, you can make use of four helps by pressing the 'H' key or the button "}
                     <span><img class="icon__img" src="/images/match_icon.svg" alt="show_matches" /></span>
                     {", which highlights up to four matches to assist you in spotting them on time."}</p>
                 <p>{"The cell to be matched can be changed by pressing the numeric keys '1-4', with each selection yielding different points."}</p>
-                <p>{"There are currently two levels at play: Level 1 is a multi-core binary representation of the network core usage. 
+                <p>{"There are currently two levels at play: Level 1 is a multi-core binary representation of the network core usage.
                     Level 2 is a multi-core colorful representation based on parachain Ids and their respective core assignment. 
                     Level 2 is available as soon as a minimum of 64 points are reached and you can switch bettwen levels by pressing the respective level buttons "}
                     <span><img class="icon__img" src="/images/level1_icon.svg" alt="level 1" /></span>{" "}
@@ -1061,12 +1061,14 @@ impl App {
     }
 
     fn start(&mut self) {
-        self.reset();
-        self.previous_board_status = Some(self.board_status.clone());
-        self.board_status = BoardStatus::Game;
-        self.game_status = GameStatus::On;
-        self.game_level = GameLevel::Level1;
-        self.set_match_position(self.game_level.match_x_position().try_into().unwrap());
+        if !self.is_game_on() {
+            self.reset();
+            self.previous_board_status = Some(self.board_status.clone());
+            self.board_status = BoardStatus::Game;
+            self.game_status = GameStatus::On;
+            self.game_level = GameLevel::Level1;
+            self.set_match_position(self.game_level.match_x_position().try_into().unwrap());
+        }
     }
 
     fn get_match_block(&self) -> Option<Block> {
@@ -1191,6 +1193,20 @@ impl App {
     fn start_help(&mut self) {
         if self.is_game_on() && self.game_help_status.is_available() {
             self.game_help_status = GameHelpStatus::On;
+        }
+    }
+
+    fn show_details(&mut self) {
+        if self.is_game_on() {
+            let i = self.get_cursor_index();
+            if let Some(opt) = self.blocks.get_mut(i) {
+                if let Some(block) = opt {
+                    // Note: only flip if an animation is not undergoing
+                    if !block.is_anim_live() {
+                        block.flipped();
+                    }
+                }
+            }
         }
     }
 

@@ -3,7 +3,6 @@ use crate::{
     core::{Core, CoreView, NaCoreComponent},
     runtimes::support::SupportedRelayRuntime,
 };
-use futures::io::Empty;
 use log::{error, info};
 use std::str::FromStr;
 use subxt::utils::H256;
@@ -54,7 +53,9 @@ pub struct Block {
     pub missed_class: Option<String>,
     pub matched_class: Option<String>,
     pub help_class: Option<String>,
+    pub anim_class: Option<String>,
     pub is_selected: bool,
+    pub is_flipped: bool,
 }
 
 impl Block {
@@ -72,7 +73,9 @@ impl Block {
             missed_class: None,
             matched_class: None,
             help_class: None,
+            anim_class: None,
             is_selected: false,
+            is_flipped: false,
         }
     }
 
@@ -110,9 +113,19 @@ impl Block {
         self.missed_class = Some("missed".to_string());
     }
 
+    pub fn flipped(&mut self) {
+        self.anim_class = Some("anim".to_string());
+        self.is_flipped = !self.is_flipped;
+    }
+
+    pub fn is_anim_live(&self) -> bool {
+        self.anim_class.is_some()
+    }
+
     pub fn cleared(&mut self) {
         self.missed_class = None;
         self.help_class = None;
+        self.anim_class = None;
     }
 
     pub fn is_help_available(&self) -> bool {
@@ -159,7 +172,8 @@ impl Block {
             self.disable_class.clone(),
             self.missed_class.clone(),
             self.matched_class.clone(),
-            self.help_class.clone()
+            self.help_class.clone(),
+            self.anim_class.clone()
         )
         .to_string()
     }
@@ -225,20 +239,18 @@ impl Block {
 
     pub fn render(
         &self,
-        block_view: BlockView,
         core_view: CoreView,
         onclick: Callback<()>,
         ondblclick: Callback<()>,
         onanimationend: Callback<BlockNumber>,
     ) -> Html {
-        html! { <BlockComponent block={self.clone()} {block_view} {core_view} {onclick} {ondblclick} {onanimationend} /> }
+        html! { <BlockComponent block={self.clone()} {core_view} {onclick} {ondblclick} {onanimationend} /> }
     }
 }
 
 #[derive(Properties, PartialEq)]
 pub struct Props {
     pub block: Block,
-    pub block_view: BlockView,
     pub core_view: CoreView,
     pub onclick: Callback<()>,
     pub ondblclick: Callback<()>,
@@ -261,30 +273,29 @@ pub fn block(props: &Props) -> Html {
         <div class={classes!("corespace", props.block.classes())}
             {onclick} {ondblclick} {onanimationend}>
             {
-                match props.block_view {
-                    BlockView::Cores => {
-                        html! {
-                            <>
+                if !props.block.is_flipped {
+                    html! {
+                        <div class={classes!("cores")}>
                             { for props.block.corespace.iter().map(|c| c.render(props.core_view.clone())) }
                             { for not_available_vec.iter().map(|_| html! { <NaCoreComponent /> } ) }
-                            </>
-                        }
+                        </div>
                     }
-                    BlockView::Palette => {
-                        let core_usage = format!(
-                            "{}%",
-                            props.block.corespace_usage()
-                        );
-                        let block_number = format!(
-                            "#{}",
-                            props.block.block_number.clone(),
-                        );
-                        html! {
-                            <div class={classes!("palette")} style={props.block.inline_style()}>
-                                <h6 class="usage">{ core_usage }</h6>
-                                <span class="block_number">{ block_number }</span>
-                            </div>
-                        }
+                } else {
+                    let core_usage = format!(
+                        "{}%",
+                        props.block.corespace_usage()
+                    );
+                    let block_number = format!(
+                        "#{}",
+                        props.block.block_number.clone(),
+                    );
+                    html! {
+                        <div class={classes!("palette")}>
+                            <span class="label">{ "core usage" }</span>
+                            <span class="details">{ core_usage }</span>
+                            <span class="label">{ "finalized block" }</span>
+                            <span class="details">{ block_number }</span>
+                        </div>
                     }
                 }
             }
