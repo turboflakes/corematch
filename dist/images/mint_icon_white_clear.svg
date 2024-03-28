@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="60px" height="60px" viewBox="0 0 60 60" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>info_icon</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Desktop" transform="translate(-1384.000000, -329.000000)" fill-rule="nonzero">
+            <g id="info_icon" transform="translate(1384.000000, 329.000000)">
+                <rect id="Rectangle" x="0" y="0" width="60" height="60" rx="4"></rect>
+                <path d="M50,33 L50,28 L15,28 L15,33 L26.5729135,33 L50,33 Z M30,48 L30,43 L25,43 L25,48 L26.6532734,48 L30,48 Z M30,18 L30,13 L25,13 L25,18 L26.6532734,18 L30,18 Z M20,38 L20,33 L15,33 L15,38 L16.6532734,38 L20,38 Z M25,43 L25,38 L20,38 L20,43 L21.6532734,43 L25,43 Z M25,23 L25,18 L20,18 L20,23 L21.6532734,23 L25,23 Z M20,28 L20,23 L15,23 L15,28 L16.6532734,28 L20,28 Z M15,48 L15,13 L10,13 L10,48 L11.6532734,48 L15,48 Z" id="icon" fill="#FFFFFF" transform="translate(30.000000, 30.500000) rotate(-90.000000) translate(-30.000000, -30.500000) "></path>
+            </g>
+        </g>
+    </g>
+</svg>

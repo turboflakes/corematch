@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="124px" height="55px" viewBox="0 0 124 55" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>corematch_icon</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard" transform="translate(-190.000000, -642.000000)" fill="#000000" fill-rule="nonzero">
+            <g id="corematch_icon" transform="translate(190.000000, 642.000000)">
+                <g id="right" transform="translate(70.000000, 0.000000)">
+                    <polygon id="Path" points="18 36.55 27 36.55 27 27.3 27 18.05 18 18.05 9 18.05 9 8.8 0 8.8 0 18.05 0 27.3 0 36.55 0 45.8 9 45.8 9 36.55"></polygon>
+                    <polygon id="Path" points="27 9 36 9 45 9 45 0 36 0 27 0 18 0 9 0 9 9 18 9"></polygon>
+                    <polygon id="Path" points="27 45.8 18 45.8 9 45.8 9 54.8 18 54.8 27 54.8 36 54.8 45 54.8 45 45.8 36 45.8"></polygon>
+                    <polygon id="Path" points="45 8.8 45 18.05 45 27.3 45 36.55 45 45.8 54 45.8 54 36.55 54 27.3 54 18.05 54 8.8"></polygon>
+                </g>
+                <g id="left">
+                    <polygon id="Path" points="18 36.55 27 36.55 27 27.3 27 18.05 18 18.05 9 18.05 9 8.8 0 8.8 0 18.05 0 27.3 0 36.55 0 45.8 9 45.8 9 36.55"></polygon>
+                    <polygon id="Path" points="27 9 36 9 45 9 45 0 36 0 27 0 18 0 9 0 9 9 18 9"></polygon>
+                    <polygon id="Path" points="27 45.8 18 45.8 9 45.8 9 54.8 18 54.8 27 54.8 36 54.8 45 54.8 45 45.8 36 45.8"></polygon>
+                    <polygon id="Path" points="45 8.8 45 18.05 45 27.3 45 36.55 45 45.8 54 45.8 54 36.55 54 27.3 54 18.05 54 8.8"></polygon>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
