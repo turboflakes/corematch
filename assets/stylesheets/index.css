@@ -38,6 +38,7 @@ body {
     url('/images/noise.svg'); */
 
     height: 100vh;
+    overflow: hidden;
 }
 
 .container {
@@ -46,7 +47,7 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: 100%;
 }
 
 .header {
@@ -306,6 +307,8 @@ footer .caption {
     border-radius: 2px;
     inline-size: var(--corespace-size);
     block-size: var(--corespace-size);
+    /* disable double-tap zoom on mobile */
+    touch-action: manipulation;
 }
 
 .corespace.anim {
