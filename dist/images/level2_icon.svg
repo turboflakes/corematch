@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="60px" height="60px" viewBox="0 0 60 60" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>level2_icon</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Desktop" transform="translate(-1209.000000, -102.000000)" fill-rule="nonzero">
+            <g id="level2_icon" transform="translate(1209.000000, 102.000000)">
+                <rect id="Rectangle" fill="#212529" x="0" y="0" width="60" height="60" rx="4"></rect>
+                <polygon id="Path" fill="#7388FD" transform="translate(30.000000, 40.000000) rotate(-90.000000) translate(-30.000000, -40.000000) " points="32.5 42.5 32.5 37.5 27.5 37.5 27.5 42.5 29.1532734 42.5"></polygon>
+                <polygon id="Path" fill="#F3F5FB" transform="translate(40.000000, 40.000000) rotate(-90.000000) translate(-40.000000, -40.000000) " points="42.5 42.5 42.5 37.5 37.5 37.5 37.5 42.5 39.1532734 42.5"></polygon>
+                <polygon id="Path" fill="#FDF373" transform="translate(40.000000, 30.000000) rotate(-90.000000) translate(-40.000000, -30.000000) " points="42.5 32.5 42.5 27.5 37.5 27.5 37.5 32.5 39.1532734 32.5"></polygon>
+                <polygon id="Path" fill="#FC73AA" transform="translate(40.000000, 20.000000) rotate(-90.000000) translate(-40.000000, -20.000000) " points="42.5 22.5 42.5 17.5 37.5 17.5 37.5 22.5 39.1532734 22.5"></polygon>
+                <polygon id="Path" fill="#FFFFFF" transform="translate(30.000000, 30.000000) rotate(-90.000000) translate(-30.000000, -30.000000) " points="32.5 32.5 32.5 27.5 27.5 27.5 27.5 32.5 29.1532734 32.5"></polygon>
+                <polygon id="Path" fill="#FDA374" transform="translate(20.000000, 40.000000) rotate(-90.000000) translate(-20.000000, -40.000000) " points="22.5 42.5 22.5 37.5 17.5 37.5 17.5 42.5 19.1532734 42.5"></polygon>
+                <polygon id="Path" fill="#73FCF1" transform="translate(20.000000, 30.000000) rotate(-90.000000) translate(-20.000000, -30.000000) " points="22.5 32.5 22.5 27.5 17.5 27.5 17.5 32.5 19.1532734 32.5"></polygon>
+                <polygon id="Path" fill="#85FD73" transform="translate(20.000000, 20.000000) rotate(-90.000000) translate(-20.000000, -20.000000) " points="22.5 22.5 22.5 17.5 17.5 17.5 17.5 22.5 19.1532734 22.5"></polygon>
+                <polygon id="Path" fill="#9F73FC" transform="translate(30.000000, 20.000000) rotate(-90.000000) translate(-30.000000, -20.000000) " points="32.5 22.5 32.5 17.5 27.5 17.5 27.5 22.5 29.1532734 22.5"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>
