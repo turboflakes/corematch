@@ -1,71 +1,81 @@
-html { 
-  font-size: 16px;
+html {
+    font-size: 16px;
 }
 
 body {
-  font-family: 'Pixel Operator', Courier, monospace;
-  line-height: 1.6;
-  font-size: var(--font-size);
-  color: var(--color-primary);
+    font-family: "Pixel Operator", Courier, monospace;
+    line-height: 1.6;
+    font-size: var(--font-size);
+    color: var(--color-primary);
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: 'Pixel Operator HB 8', Courier, monospace;
-  color: var(--color-primary);
-  margin-top: 0;
-  margin-bottom: 2rem;
-  font-weight: 300;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: "Pixel Operator HB 8", Courier, monospace;
+    color: var(--color-primary);
+    margin-top: 0;
+    margin-bottom: 2rem;
+    font-weight: 300;
 }
 
-p, span, div, ul, li, a {
-  font-family: 'Pixel Operator', Courier, monospace;
-  /* font-size: 1.8rem; */
-  color: var(--color-primary);
+p,
+span,
+div,
+ul,
+li,
+a {
+    font-family: "Pixel Operator", Courier, monospace;
+    /* font-size: 1.8rem; */
+    color: var(--color-primary);
 }
 
 b {
-  font-family: 'Pixel Operator HB', Courier, monospace;
-  color: var(--color-primary);
+    font-family: "Pixel Operator HB", Courier, monospace;
+    color: var(--color-primary);
 }
 
 p {
-  margin-bottom: 1.2rem;
+    margin-bottom: 1.2rem;
 }
 
 h6 {
-  margin: 1.8rem 0 1.2rem 0;
-  line-height: 1.6;
-  letter-spacing: 0;
+    margin: 1.8rem 0 1.2rem 0;
+    line-height: 1.6;
+    letter-spacing: 0;
 }
 
 th,
 td {
-  padding: 0 1rem;
-  font-size: var(--font-size-small);
+    padding: 0 1rem;
+    font-size: var(--font-size-small);
 }
 
 tr {
-  border-bottom: 0;
+    border-bottom: 0;
 }
 
 th {
-  text-align: center;
-  vertical-align:bottom;
-  border-bottom: 0;
+    text-align: center;
+    vertical-align: bottom;
+    border-bottom: 0;
 }
 
 button {
-  border: 0;
-  padding: 0;
-  margin: 0;
-  cursor: pointer;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
 }
 button:disabled {
-  opacity: 0.2;
+    opacity: 0.2;
 }
 button:hover {
-  opacity: 0.6;
+    opacity: 0.6;
 }
 button:active:hover:not([disabled]) {
-  top: 2px;
+    top: 2px;
 }
