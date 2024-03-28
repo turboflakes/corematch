@@ -1,0 +1,29 @@
+@font-face {
+    font-family: "Pixel Operator HB 8";
+    src:
+        local("Pixel Operator HB8"),
+        local("Pixel Operator HB8"),
+        url("/fonts/PixelOperator/PixelOperatorHB8.ttf") format("truetype");
+    font-weight: 800;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Pixel Operator HB";
+    src:
+        local("Pixel Operator HB"),
+        local("Pixel Operator HB"),
+        url("/fonts/PixelOperator/PixelOperatorHB.ttf") format("truetype");
+    font-weight: 600;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Pixel Operator";
+    src:
+        local("Pixel Operator"),
+        local("Pixel Operator"),
+        url("/fonts/PixelOperator/PixelOperator.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+}
