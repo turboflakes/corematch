@@ -6,6 +6,7 @@
     
     
     
+    
     <!--  -->
     <link rel="icon" href="/favicon.ico">
     <link rel="stylesheet" href="css/normalize.css">
@@ -13,12 +14,39 @@
     <link rel="stylesheet" href="/root-b101f686f6bca4c3.css">
     <link rel="stylesheet" href="/fonts-df9d459f699e7608.css">
     <link rel="stylesheet" href="/elements-91a7d41b51eafb24.css">
-    <link rel="stylesheet" href="/index-7a4cafdad0fc7ba5.css">
+    <link rel="stylesheet" href="/index-9793fef361b0755f.css">
     <script src="/index-348e29a073b589a8.js"></script>
   
-<link rel="preload" href="/corematch-93bb33825c52d713_bg.wasm" as="fetch" type="application/wasm" crossorigin="">
-<link rel="modulepreload" href="/corematch-93bb33825c52d713.js"></head>
+<link rel="preload" href="/corematch-89c32bf4d1192927_bg.wasm" as="fetch" type="application/wasm" crossorigin="">
+<link rel="modulepreload" href="/corematch-89c32bf4d1192927.js"></head>
   <body>
   
 
-<script type="module">import init from '/corematch-93bb33825c52d713.js';init('/corematch-93bb33825c52d713_bg.wasm');</script></body></html>
+<script type="module">import init from '/corematch-89c32bf4d1192927.js';init('/corematch-89c32bf4d1192927_bg.wasm');</script><script>(function () {
+    var protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    var url = protocol + '//' + window.location.host + '/_trunk/ws';
+    var poll_interval = 5000;
+    var reload_upon_connect = () => {
+        window.setTimeout(
+            () => {
+                // when we successfully reconnect, we'll force a
+                // reload (since we presumably lost connection to
+                // trunk due to it being killed, so it will have
+                // rebuilt on restart)
+                var ws = new WebSocket(url);
+                ws.onopen = () => window.location.reload();
+                ws.onclose = reload_upon_connect;
+            },
+            poll_interval);
+    };
+
+    var ws = new WebSocket(url);
+    ws.onmessage = (ev) => {
+        const msg = JSON.parse(ev.data);
+        if (msg.reload) {
+            window.location.reload();
+        }
+    };
+    ws.onclose = reload_upon_connect;
+})()
+</script></body></html>
