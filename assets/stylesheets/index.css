@@ -51,11 +51,12 @@ body {
 }
 
 .header {
-    margin-left: 3em;
+    margin-left: 2em;
+    align-self: end;
 }
 
 .header > .corematch__logo {
-    max-width: calc(var(--gameboard-size) * 0.5);
+    max-width: calc(var(--gameboard-size) * 0.625);
     margin-bottom: 0;
 }
 
@@ -139,7 +140,7 @@ footer .caption {
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 1em;
+    border-radius: 0.5em;
     box-shadow:
         var(--color-shadow) 0px 1px 2px,
         var(--color-shadow) 0px 0px 0px 3px;
@@ -161,6 +162,7 @@ footer .caption {
 }
 
 .content__body > .cb__left > .bottom {
+    margin-right: 0.4em;
 }
 
 .content__body > .cb__right {
@@ -249,8 +251,6 @@ footer .caption {
 
 .countdown {
     font-size: var(--font-size-small);
-    position: absolute;
-    top: 0;
 }
 
 .countdown.match__0 span:last-child,
@@ -625,7 +625,18 @@ footer .caption {
     opacity: 0.2;
 }
 
-.points__info {
+.score__info {
+    position: absolute;
+    top: 0;
+    left: 2em;
+}
+
+.score__info > span {
+    font-size: var(--font-size-x-small);
+    margin-right: 1em;
+}
+
+.base_points__info {
     font-size: var(--font-size-small);
     position: absolute;
     top: 0;

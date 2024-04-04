@@ -11,9 +11,7 @@ pub enum Msg {
 #[derive(Properties, PartialEq)]
 pub struct Props {
     pub block_number: Option<BlockNumber>,
-    pub visible: bool,
-    pub index: usize,
-    pub class: String,
+    pub visible: bool
 }
 
 pub struct BlockTimer {
@@ -75,13 +73,8 @@ impl Component for BlockTimer {
         } else {
             Some("hidden")
         };
-        let additional_class = ctx.props().class.clone();
         html! {
-            <div class={classes!("countdown", visible_class, additional_class)}>
-                { if ctx.props().index < 2 { html! { <span>{"⤹"}</span> } } else { html! {} } }
-                <span>{format!("Match this pattern in {}.{}s", self.seconds, self.milliseconds)}</span>
-                { if ctx.props().index >= 2 { html! { <span>{"⤵"}</span> } } else { html! {} } }
-            </div>
+            <span class={classes!("countdown", visible_class)}>{"countdown: "}<b>{format!(" {}.{}s", self.seconds, self.milliseconds)}</b></span>
         }
     }
 }

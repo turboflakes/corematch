@@ -610,7 +610,7 @@ impl App {
                     <div class="content__wrapper">
                         <div class="content__menu">
                             { self.head_left_view(link) }
-                            { self.head_right_view(link) }
+                            // { self.head_right_view(link) }
                         </div>
                         <div class="content__body">
                             <div class="cb__left">
@@ -696,6 +696,22 @@ impl App {
         }
     }
 
+    fn score_view(&self, link: &Scope<Self>) -> Html {
+        let visible_class = if self.is_game_on() {
+            Some("visible")
+        } else {
+            Some("hidden")
+        };
+        html! { 
+            <span class={classes!("score__info", visible_class)}>
+                <span>{"points: "} <b>{format!("{} ", self.points)}</b></span>
+                <span>{"duration: "} <b>{format!("{} ", self.duration)}</b></span>
+                <span>{"attempts: "} <b>{format!("{} ", self.tries)}</b></span>
+                { self.block_countdown_view(link)}
+            </span>    
+        }
+    }
+
     fn base_points_view(&self, _link: &Scope<Self>) -> Html {
         let visible_class = if self.is_game_on() {
             Some("visible")
@@ -703,7 +719,7 @@ impl App {
             Some("hidden")
         };
         let base_points = (4 - self.get_match_index() as u32) * DEFAULT_BASE_POINTS;
-        html! { <span class={classes!("points__info", visible_class)}>{format!("x{}", base_points)} </span> }
+        html! { <span class={classes!("base_points__info", visible_class)}>{format!("x{}", base_points)} </span> }
     }
 
     fn block_countdown_view(&self, _link: &Scope<Self>) -> Html {
@@ -712,8 +728,7 @@ impl App {
         } else {
             None
         };
-        html! { <BlockTimer block_number={block_number.clone()} visible={self.is_game_on()}
-        index={self.get_match_index()} class={self.match_class()} /> }
+        html! { <BlockTimer block_number={block_number.clone()} visible={self.is_game_on()} /> }
     }
 
     fn _match_caption_view(&self, _link: &Scope<Self>) -> Html {
@@ -778,8 +793,8 @@ impl App {
             },
             _ => html! {
                 <>
-                    { self.base_points_view(link) }
-                    { self.block_countdown_view(link) }
+                    { self.score_view(link) }
+                    // { self.base_points_view(link) }
                     { self.attempts_column_view(link) }
                     { self.helps_column_view(link) }
                     <div class={classes!("gameboard", is_game_on_class, self.game_level.class(), self.match_class())}>
@@ -808,8 +823,7 @@ impl App {
     fn head_left_view(&self, _link: &Scope<Self>) -> Html {
         html! {
             <div class="header">
-                <img class="corematch__logo" src="/images/corematch_logo.svg" alt="corematch logo" />
-                <div class="subtitle">{"Unstoppable Matching Game"}</div>
+                <img class="corematch__logo" src="/images/corematch_logo_full.svg" alt="corematch logo" />
             </div>
         }
     }
@@ -994,8 +1008,8 @@ impl App {
         html! {
             <footer class="footer">
                 <div>
-                    <div class="caption">{"Corematch // Built by Turboflakes // Unstoppable by Polkadot"}</div>
-                    <div class="caption">{"© 2024 Turboflakes"}</div>
+                    <div class="caption">{"Built by Turboflakes // Unstoppable by Polkadot"}</div>
+                    <div class="caption">{"Corematch © 2024 Turboflakes"}</div>
                 </div>
                 <div class="footer__icons">
                     <a class="logo" href="https://turboflakes.io" target="_blank">

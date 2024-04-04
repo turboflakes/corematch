@@ -24,6 +24,7 @@ pub mod node_runtime {}
 
 const SIX_SECS: Duration = Duration::from_secs(6);
 const DEFAULT_TOTAL_BLOCKS: u32 = 16;
+const DEFAULT_TOTAL_CORES: u32 = 49;
 
 /// subscribes to finalized blocks, when a block is received, fetch storage for the block hash and send it via the callback.
 pub async fn subscribe_to_finalized_blocks(
@@ -35,6 +36,7 @@ pub async fn subscribe_to_finalized_blocks(
     // Generate a unique subscription_id
     let mut rng = rand::thread_rng();
     let subscription_id = rng.gen::<u32>();
+        
     spawn_local(async move {
         // set number of previous blocks to be fetched
         let mut previous_blocks_processed: Option<_> = Some(DEFAULT_TOTAL_BLOCKS);
@@ -129,7 +131,7 @@ pub async fn fetch_corespace(
         .await?;
 
     if let Some(availability_cores) = availability_cores_option {
-        let corespace = availability_cores
+        let mut corespace = availability_cores
             .iter()
             .enumerate()
             .map(|(i, core_occupied)| match core_occupied {
@@ -140,6 +142,9 @@ pub async fn fetch_corespace(
                 }
             })
             .collect::<Corespace>();
+
+        // Note: keep only the predefined number of cores
+        corespace.truncate(DEFAULT_TOTAL_CORES as usize);
 
         return Ok(Block::new(
             block_number.clone(),
