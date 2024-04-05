@@ -806,19 +806,21 @@ impl App {
     }
 
     fn keyboard_view(&self, link: &Scope<Self>) -> Html {
-        let visible_class = if self.is_game_on() {
-            Some("visible")
+        if self.is_game_on() {
+            html! {
+                <span class={classes!("keyboard__info", "visible")}>
+                    <span>{"H=HIGHLIGHT"}</span>
+                    <span>{"F=FLIP"}</span>
+                    <span>{"UP/DOWN/LEFT/RIGHT=MOVE"}</span>
+                    <span>{"SPACE=SELECT & MATCH"}</span>
+                </span>
+            }
         } else {
-            Some("hidden")
-        };
-        html! {
-            <span class={classes!("keyboard__info", visible_class)}>
-                <span>{"S=START"}</span>
-                <span>{"H=HIGHLIGHT"}</span>
-                <span>{"F=FLIP"}</span>
-                <span>{"UP/DOWN/LEFT/RIGHT=MOVE"}</span>
-                <span>{"SPACE=SELECT & MATCH"}</span>
-            </span>
+            html! { 
+                <span class={classes!("keyboard__info", "visible")}>
+                    <span>{"S=START"}</span>
+                </span>
+            }
         }
     }
 
