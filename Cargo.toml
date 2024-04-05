@@ -10,7 +10,7 @@ edition = "2021"
 [dependencies]
 wasm-bindgen = "0.2.89"
 wasm-bindgen-futures = "0.4.39"
-wasm-logger = "0.2.1"
+wasm-logger = "0.2.0"
 yew = { version = "0.21", features = ["csr"] }
 yew-hooks = "0.3.0"
 subxt = { version = "0.34", default-features = false, features = ["jsonrpsee", "web", "unstable-light-client"], target_arch = "wasm32" }
