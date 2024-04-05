@@ -384,7 +384,7 @@ footer .caption {
 
 .corespace.polkadot > .palette,
 .corespace.kusama > .palette {
-    background-color: var(--color-background);
+    background-color: var(--color-background-darker);
     display: flex;
     flex-direction: column;
     padding: 1rem;
@@ -394,6 +394,7 @@ footer .caption {
 
 .corespace > .palette > .label {
     font-size: var(--font-size-x-small);
+    color: var(--color-white);
     margin: 0;
     padding: 0;
     line-height: 1;
@@ -401,6 +402,7 @@ footer .caption {
 
 .corespace > .palette > .details {
     font-size: var(--font-size-small);
+    color: var(--color-white);
     margin: 0 0 1em 0;
     padding: 0;
 }

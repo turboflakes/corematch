@@ -18,6 +18,7 @@
     --color-primary: hsl(var(--hsl-900));
     --color-primary-lighter: hsl(var(--hsl-200));
     --color-background: hsl(var(--hsl-200));
+    --color-background-darker: hsl(var(--hsl-600));
     --color-content: hsl(var(--hsl-100));
     --color-shadow: hsl(var(--hsl-800));
     --color-shadow-lighter: hsl(var(--hsl-300));
