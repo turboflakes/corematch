@@ -242,9 +242,12 @@ impl Block {
         core_view: CoreView,
         onclick: Callback<()>,
         ondblclick: Callback<()>,
+        ontouchstart: Callback<()>,
+        ontouchend: Callback<()>,
         onanimationend: Callback<BlockNumber>,
     ) -> Html {
-        html! { <BlockComponent block={self.clone()} {core_view} {onclick} {ondblclick} {onanimationend} /> }
+        html! { <BlockComponent block={self.clone()} {core_view} {onclick} {ondblclick}
+        {ontouchstart} {ontouchend} {onanimationend} /> }
     }
 }
 
@@ -254,6 +257,8 @@ pub struct Props {
     pub core_view: CoreView,
     pub onclick: Callback<()>,
     pub ondblclick: Callback<()>,
+    pub ontouchstart: Callback<()>,
+    pub ontouchend: Callback<()>,
     pub onanimationend: Callback<BlockNumber>,
 }
 
@@ -261,6 +266,8 @@ pub struct Props {
 pub fn block(props: &Props) -> Html {
     let onclick = props.onclick.reform(move |_| ());
     let ondblclick = props.ondblclick.reform(move |_| ());
+    let ontouchstart = props.ontouchstart.reform(move |_| ());
+    let ontouchend = props.ontouchend.reform(move |_| ());
     let block_number = props.block.block_number.clone();
     let onanimationend = props.onanimationend.reform(move |_| block_number.clone());
 
@@ -271,7 +278,7 @@ pub fn block(props: &Props) -> Html {
 
     html! {
         <div class={classes!("corespace", props.block.classes())}
-            {onclick} {ondblclick} {onanimationend}>
+            {onclick} {ondblclick} {ontouchstart} {ontouchend} {onanimationend}>
             {
                 if !props.block.is_flipped {
                     html! {

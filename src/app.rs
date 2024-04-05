@@ -812,11 +812,17 @@ impl App {
                     <span>{"H=HIGHLIGHT"}</span>
                     <span>{"F=FLIP"}</span>
                     <span>{"UP/DOWN/LEFT/RIGHT=MOVE"}</span>
-                    <span>{"SPACE=SELECT & MATCH"}</span>
+                    {
+                        if self.get_match_index().is_none() {
+                            html! { <span>{"SPACE=SELECT"}</span> }
+                        } else {
+                            html! { <span>{"SPACE=MATCH"}</span> }
+                        }
+                    }
                 </span>
             }
         } else {
-            html! { 
+            html! {
                 <span class={classes!("keyboard__info", "visible")}>
                     <span>{"S=START"}</span>
                 </span>
@@ -910,11 +916,15 @@ impl App {
                                 if let Some(block) = block_option {
                                     let block_clicked = link.callback(move |_| Msg::BlockClicked(i.clone()));
                                     let block_dblclicked = link.callback(move |_| Msg::BlockPressed(i.clone()));
+                                    let block_touchstart = link.callback(move |_| Msg::BlockClicked(i.clone()));
+                                    let block_touchend = link.callback(move |_| Msg::BlockPressed(i.clone()));
                                     let block_animation_ended = link.callback(move |bn| Msg::BlockAnimationEnded(bn));
                                     block.render(
                                         self.game_level.core_view(Some(self.network_state.parachain_colors.clone())),
                                         block_clicked.clone(),
                                         block_dblclicked.clone(),
+                                        block_touchstart.clone(),
+                                        block_touchend.clone(),
                                         block_animation_ended.clone()
                                     )
                                 } else {
