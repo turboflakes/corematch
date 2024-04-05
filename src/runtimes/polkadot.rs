@@ -36,7 +36,7 @@ pub async fn subscribe_to_finalized_blocks(
     // Generate a unique subscription_id
     let mut rng = rand::thread_rng();
     let subscription_id = rng.gen::<u32>();
-        
+
     spawn_local(async move {
         // set number of previous blocks to be fetched
         let mut previous_blocks_processed: Option<_> = Some(DEFAULT_TOTAL_BLOCKS);

@@ -33,6 +33,7 @@
     --color-yellow-lighter: hsl(var(--hsl-yellow-lighter));
     --color-red: hsl(var(--hsl-red));
     --color-white: hsl(var(--hsl-100));
+    --color-black: hsl(var(--hsl-900));
     /*  */
     --rgb-polkadot: 230 0 122;
     --rgb-kusama: 0 0 0;

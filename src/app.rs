@@ -38,9 +38,9 @@ const DEFAULT_INITIAL_POINTS: u32 = 0;
 const DEFAULT_BASE_POINTS: u32 = 4;
 const DEFAULT_INITIAL_DURATION: u32 = 0;
 const DEFAULT_INITIAL_TRIES: u32 = 4;
-const DEFAULT_INITIAL_HELPS: u32 = 4;
+const DEFAULT_INITIAL_HELPS: u32 = 8;
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Debug)]
 pub enum BoardStatus {
     Game,
     Account,
@@ -107,7 +107,7 @@ impl GameLevel {
 
     pub fn collected_points_per_level_minimum(&self) -> u32 {
         match &self {
-            Self::Level1 => 64,
+            Self::Level1 => 32,
             _ => unimplemented!(),
         }
     }
@@ -164,8 +164,10 @@ pub enum Msg {
     NetworkButtonClicked(AttrValue),
     BlockClicked(usize),
     BlockPressed(usize),
-    BlockMatched,
+    BlockMatched(usize),
+    BlockMissed(usize),
     BlockAnimationEnded(BlockNumber),
+    CheckGameStatus,
     StartButtonClicked,
     HelpButtonClicked,
     LevelButtonClicked(GameLevel),
@@ -191,8 +193,9 @@ pub struct App {
     previous_board_status: Option<BoardStatus>,
     network_state: Rc<NetworkState>,
     blocks: Vec<Option<Block>>,
-    match_position: Position,
+    match_position: Option<Position>,
     match_counter: u32,
+    matches: BTreeMap<H256, u32>,
     previous_match_block: Option<Block>,
     game_status: GameStatus,
     game_level: GameLevel,
@@ -240,8 +243,9 @@ impl Component for App {
             previous_board_status: None,
             network_state,
             blocks: vec![None; 16],
-            match_position: (3, 0),
+            match_position: None,
             match_counter: 0,
+            matches: BTreeMap::new(),
             previous_match_block: None,
             game_status: GameStatus::Init,
             game_level: GameLevel::Level1,
@@ -293,49 +297,80 @@ impl Component for App {
                 // FOR TESTING ONLY -- end
 
                 if self.network_state.is_valid(subscription_id) {
+                    // reset match block
+                    self.reset_match_block();
                     // add latest block into the first position
                     self.blocks.insert(0, Some(block.clone()));
+                    let block_hash = block.corespace_hash(self.game_level.clone());
+                    // add match counter for block_hash_key
+                    self.matches
+                        .entry(block_hash)
+                        .and_modify(|m| *m += 1)
+                        .or_insert(1);
                     // oldest block gets removed
                     if self.blocks.len() > 16 {
-                        self.blocks.pop();
+                        if let Some(opt) = self.blocks.pop() {
+                            if let Some(block) = opt {
+                                let block_hash = block.corespace_hash(self.game_level.clone());
+                                // subtract counter from block_hash_key
+                                self.matches.entry(block_hash.clone()).and_modify(|m| {
+                                    if *m >= 1 {
+                                        *m -= 1
+                                    }
+                                });
+                                // remove if counter is zero
+                                if let Some(counter) = self.matches.get(&block_hash) {
+                                    if *counter == 0 {
+                                        self.matches.remove(&block_hash);
+                                    }
+                                }
+                            }
+                        }
                     }
-                    // reset match counter
-                    self.match_counter = 0;
 
-                    // set match counter and highlights match blocks if help is on
-                    if let Some(match_block) = &self.get_match_block() {
-                        // TODO: corespace_hash is based on the level
-                        let match_hash = match_block.corespace_hash(self.game_level.clone());
+                    if self.is_game_on() {
+                        // guarantee that only the current cursor position is selected
                         let cursor_index = self.get_cursor_index();
-                        let match_index = self.get_match_index();
-                        let mut help_matches_counter = 0;
                         for (i, opt) in self.blocks.iter_mut().enumerate() {
                             if let Some(block) = opt {
-                                // highlight matches if help is on
-                                if self.game_help_status.is_on()
-                                    && match_hash == block.corespace_hash(self.game_level.clone())
-                                {
-                                    if block.is_help_available()
-                                        && !block.is_disabled()
-                                        && i != match_index
-                                    {
-                                        // highlight block
-                                        block.help();
-                                        help_matches_counter += 1;
-                                    }
-                                } else {
-                                    block.cleared();
-                                }
-                                // select current cursor position
                                 if self.game_status == GameStatus::On && cursor_index == i {
                                     block.selected();
                                 } else {
                                     block.unselected();
+                                    block.cleared();
                                 }
                             }
                         }
-                        // decreseas help counter
-                        self.decr_help_matches(help_matches_counter);
+
+                        // highlight matches if help is on
+                        if self.game_help_status.is_on() {
+                            let matches: Vec<_> = Vec::from_iter(self.matches.iter())
+                                .iter()
+                                .filter(|(_, counter)| **counter > 1)
+                                .map(|(hash, _)| **hash)
+                                .collect();
+
+                            // highlight only the same pattern at a time
+                            if matches.len() > 1 {
+                                let mut help_matches_counter = 0;
+                                if let Some(block_hash) = matches.get(matches.len() - 1) {
+                                    for opt in self.blocks.iter_mut() {
+                                        if let Some(block) = opt {
+                                            if *block_hash
+                                                == block.corespace_hash(self.game_level.clone())
+                                            {
+                                                if block.is_help_available() && !block.is_disabled()
+                                                {
+                                                    block.help();
+                                                    help_matches_counter += 1;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    self.decr_help_matches(help_matches_counter);
+                                }
+                            }
+                        }
                     }
 
                     // update game stats if game is on
@@ -355,7 +390,7 @@ impl Component for App {
             Msg::BlockPressed(i) => {
                 if self.is_game_on() {
                     let match_block = self.get_match_block();
-                    if let Some(opt) = self.blocks.get_mut(i) {
+                    if let Some(opt) = self.blocks.get(i) {
                         if let Some(block) = opt {
                             if block.is_matched() || block.is_disabled() {
                                 return false;
@@ -363,34 +398,93 @@ impl Component for App {
                             if let Some(match_block) = match_block {
                                 let corespace_hash = block.corespace_hash(self.game_level.clone());
                                 if match_block.block_number == block.block_number {
+                                    // unselect previous match block
+                                    self.match_position = None;
                                     return false;
                                 } else if match_block.corespace_hash(self.game_level.clone())
                                     == corespace_hash
                                 {
-                                    info!("Congrats, you found a match!");
-                                    // increase points and update corespace by an empty space
-                                    block.matched();
-                                    self.match_succeed();
+                                    ctx.link().send_message(Msg::BlockMatched(i));
                                 } else {
-                                    block.missed();
-                                    self.match_failed();
-                                    // verify if game is over
-                                    if self.is_game_over() {
-                                        info!("** Game Over **");
-                                        // keep a copy of the last match block
-                                        self.previous_match_block.replace(match_block.clone());
-                                        info!("\n{}", self.share_message().unwrap_or_default());
-                                        // clear selected block
-                                        let i = self.get_cursor_index();
-                                        self.unselect_block(i);
-                                        // show available options
-                                        self.board_status = BoardStatus::Options;
-                                    }
+                                    ctx.link().send_message(Msg::BlockMissed(i));
                                 }
+                            } else {
+                                // first block pressed is the one to be matched
+                                let cursor_index = self.get_cursor_index();
+                                self.set_match_position(cursor_index);
                             }
                         }
                     }
                 }
+            }
+            Msg::BlockMatched(i) => {
+                info!("Congrats, you found a match!");
+                if let Some(opt) = self.blocks.get_mut(i) {
+                    if let Some(block) = opt {
+                        // highlight block matched
+                        block.matched();
+                    }
+                }
+                if let Some(i) = self.get_match_index() {
+                    if let Some(opt) = self.blocks.get_mut(i) {
+                        if let Some(block) = opt {
+                            // highlight block matched
+                            block.matched();
+                            // remove from matches
+                            let block_hash = block.corespace_hash(self.game_level.clone());
+                            // subtract counter from block_hash_key
+                            self.matches.entry(block_hash.clone()).and_modify(|m| {
+                                if *m >= 2 {
+                                    *m -= 2
+                                }
+                            });
+                        }
+                    }
+                }
+                // increase points
+                self.match_succeed();
+            }
+            Msg::BlockMissed(i) => {
+                info!("Wrong match!");
+                if let Some(opt) = self.blocks.get_mut(i) {
+                    if let Some(block) = opt {
+                        block.missed();
+                    }
+                }
+                if let Some(i) = self.get_match_index() {
+                    if let Some(opt) = self.blocks.get_mut(i) {
+                        if let Some(block) = opt {
+                            // highlight block matched
+                            block.missed();
+                        }
+                    }
+                }
+                // decrease attempts
+                self.match_failed();
+                // check status
+                ctx.link().send_message(Msg::CheckGameStatus);
+            }
+            Msg::CheckGameStatus => {
+                // verify if game is over
+                if self.is_game_over() {
+                    info!("** Game Over **");
+                    // keep a copy of the last match block
+                    if let Some(index) = self.get_match_index() {
+                        if let Some(opt) = self.blocks.get(index) {
+                            if let Some(match_block) = opt {
+                                self.previous_match_block.replace(match_block.clone());
+                                info!("\n{}", self.share_message().unwrap_or_default());
+                                // clear selected block
+                                let i = self.get_cursor_index();
+                                self.unselect_block(i);
+                                // show available options
+                                self.board_status = BoardStatus::Options;
+                            }
+                        }
+                    }
+                }
+                // reset match block
+                self.reset_match_block();
             }
             Msg::NextLevel(next_level) => {
                 self.game_status = GameStatus::MoveTo(next_level.clone());
@@ -410,21 +504,6 @@ impl Component for App {
                 self.game_level = next_level;
                 self.game_status = GameStatus::On;
                 self.timeout = None;
-            }
-            Msg::BlockMatched => {
-                // lookout for current index of the matched block
-                if let Some(match_block) = &self.get_match_block() {
-                    if let Some(i) = self.blocks.iter().position(|opt| {
-                        opt.clone().unwrap().block_number == match_block.block_number
-                    }) {
-                        if let Some(opt) = self.blocks.get_mut(i) {
-                            if let Some(block) = opt {
-                                // self.match_block = None;
-                                block.matched();
-                            }
-                        }
-                    }
-                }
             }
             Msg::BlockAnimationEnded(block_number) => {
                 if let Some(i) = self
@@ -453,6 +532,18 @@ impl Component for App {
                 self.start();
             }
             Msg::HelpButtonClicked => {
+                // reset matches map
+                let mut matches: BTreeMap<H256, u32> = BTreeMap::new();
+                for opt in self.blocks.iter() {
+                    if let Some(block) = opt {
+                        let block_hash = block.corespace_hash(self.game_level.clone());
+                        matches
+                            .entry(block_hash)
+                            .and_modify(|m| *m += 1)
+                            .or_insert(1);
+                    }
+                }
+                self.matches = matches.clone();
                 self.start_help();
             }
             Msg::InfoButtonClicked => {
@@ -532,12 +623,17 @@ impl Component for App {
             Msg::KeyPressed(key) => {
                 match key {
                     SupportedKeys::Enter => {
-                        let i = self.get_cursor_index();
-                        ctx.link().send_message(Msg::BlockPressed(i))
+                        if !self.is_game_on() {
+                            self.start()
+                        } else {
+                            let i = self.get_cursor_index();
+                            ctx.link().send_message(Msg::BlockPressed(i))
+                        }
                     }
                     SupportedKeys::Space => {
                         if self.is_game_on() {
-                            self.show_details()
+                            let i = self.get_cursor_index();
+                            ctx.link().send_message(Msg::BlockPressed(i))
                         }
                         // TODO: if game over space could be used to restart the game
                         info!("Skip")
@@ -558,10 +654,6 @@ impl Component for App {
                         3 => self.move_cursor((0, self.cursor_position.1)),
                         _ => self.move_cursor((self.cursor_position.0 + 1, self.cursor_position.1)),
                     },
-                    SupportedKeys::N1 => self.set_match_position(0),
-                    SupportedKeys::N2 => self.set_match_position(1),
-                    SupportedKeys::N3 => self.set_match_position(2),
-                    SupportedKeys::N4 => self.set_match_position(3),
                     SupportedKeys::S => self.start(),
                     SupportedKeys::H => self.start_help(),
                     SupportedKeys::F => self.show_details(),
@@ -702,29 +794,25 @@ impl App {
         } else {
             Some("hidden")
         };
-        html! { 
+        html! {
             <span class={classes!("score__info", visible_class)}>
                 <span>{"points: "} <b>{format!("{} ", self.points)}</b></span>
                 <span>{"duration: "} <b>{format!("{} ", self.duration)}</b></span>
                 <span>{"attempts: "} <b>{format!("{} ", self.tries)}</b></span>
+                <span>{"helps: "} <b>{format!("{} ", self.helps)}</b></span>
                 { self.block_countdown_view(link)}
-            </span>    
+            </span>
         }
     }
 
-    fn base_points_view(&self, _link: &Scope<Self>) -> Html {
-        let visible_class = if self.is_game_on() {
-            Some("visible")
-        } else {
-            Some("hidden")
-        };
-        let base_points = (4 - self.get_match_index() as u32) * DEFAULT_BASE_POINTS;
-        html! { <span class={classes!("base_points__info", visible_class)}>{format!("x{}", base_points)} </span> }
-    }
-
     fn block_countdown_view(&self, _link: &Scope<Self>) -> Html {
-        let block_number = if let Some(block) = self.get_match_block() {
-            Some(block.block_number)
+        // reset countdown every time a new block is added to the board
+        let block_number = if let Some(opt) = self.blocks.get(0) {
+            if let Some(block) = opt {
+                Some(block.block_number)
+            } else {
+                None
+            }
         } else {
             None
         };
@@ -1081,32 +1169,44 @@ impl App {
             self.board_status = BoardStatus::Game;
             self.game_status = GameStatus::On;
             self.game_level = GameLevel::Level1;
-            self.set_match_position(self.game_level.match_x_position().try_into().unwrap());
         }
     }
 
+    fn reset_match_block(&mut self) {
+        self.match_counter = 0;
+        self.match_position = None;
+    }
+
     fn get_match_block(&self) -> Option<Block> {
-        if let Some(opt) = self.blocks.get(self.get_match_index()) {
-            if let Some(match_block) = opt {
-                return Some(match_block.clone());
+        if let Some(index) = self.get_match_index() {
+            if let Some(opt) = self.blocks.get(index) {
+                if let Some(match_block) = opt {
+                    return Some(match_block.clone());
+                }
             }
         }
         None
     }
 
-    fn get_match_index(&self) -> usize {
-        (self.match_position.1 * 4 + self.match_position.0).into()
+    fn get_match_index(&self) -> Option<usize> {
+        if let Some(position) = self.match_position {
+            return Some((position.1 * 4 + position.0).into());
+        }
+        None
     }
 
     fn set_match_position(&mut self, i: usize) {
-        self.match_position = (
+        self.match_position = Some((
             (i % 4).try_into().expect("usize with incorrect value"),
             (i / 4).try_into().expect("usize with incorrect value"),
-        );
+        ));
     }
 
     pub fn match_class(&self) -> String {
-        format!("match__{}", self.get_match_index())
+        if let Some(index) = self.get_match_index() {
+            return format!("match__{}", index);
+        }
+        "".to_string()
     }
 
     fn unselect_block(&mut self, i: usize) {
@@ -1182,9 +1282,7 @@ impl App {
         if self.is_game_on() {
             let base: u32 = 2;
             self.previous_points = self.points;
-            self.points += DEFAULT_BASE_POINTS
-                * (4 - self.get_match_index() as u32)
-                * base.pow(self.match_counter);
+            self.points += DEFAULT_BASE_POINTS * base.pow(self.match_counter);
         }
     }
 

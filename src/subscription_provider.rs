@@ -11,7 +11,7 @@ use yew::{
     Context, ContextHandle, Html, Properties,
 };
 
-use crate::runtimes::{polkadot, kusama};
+use crate::runtimes::polkadot;
 
 pub const STOP_SIGNAL: &str = "stop";
 pub const CONTINUE_SIGNAL: &str = "continue";
@@ -91,13 +91,13 @@ impl Component for SubscriptionProvider {
                                 },
                             ))
                     }
-                    SupportedRelayRuntime::Kusama => {
-                        ctx.link()
-                            .send_future(kusama::fetch_parachains(api).map(|result| match result {
-                                Ok(para_ids) => Msg::ParachainsCollected(para_ids),
-                                Err(err) => Msg::Error(err.into()),
-                            }))
-                    }
+                    // SupportedRelayRuntime::Kusama => {
+                    //     ctx.link()
+                    //         .send_future(kusama::fetch_parachains(api).map(|result| match result {
+                    //             Ok(para_ids) => Msg::ParachainsCollected(para_ids),
+                    //             Err(err) => Msg::Error(err.into()),
+                    //         }))
+                    // }
                     _ => unimplemented!(),
                 }
 
@@ -120,20 +120,20 @@ impl Component for SubscriptionProvider {
                             },
                         ),
                     ),
-                    SupportedRelayRuntime::Kusama => {
-                        ctx.link()
-                            .send_future(kusama::subscribe_to_finalized_blocks(api, cb).map(
-                                |result| match result {
-                                    Ok((subscription_id, subscription_channel)) => {
-                                        Msg::SubscriptionCreated((
-                                            subscription_id,
-                                            subscription_channel,
-                                        ))
-                                    }
-                                    Err(err) => Msg::Error(err.into()),
-                                },
-                            ))
-                    }
+                    // SupportedRelayRuntime::Kusama => {
+                    //     ctx.link()
+                    //         .send_future(kusama::subscribe_to_finalized_blocks(api, cb).map(
+                    //             |result| match result {
+                    //                 Ok((subscription_id, subscription_channel)) => {
+                    //                     Msg::SubscriptionCreated((
+                    //                         subscription_id,
+                    //                         subscription_channel,
+                    //                     ))
+                    //                 }
+                    //                 Err(err) => Msg::Error(err.into()),
+                    //             },
+                    //         ))
+                    // }
                     _ => unimplemented!(),
                 };
                 true

@@ -11,7 +11,7 @@ pub enum Msg {
 #[derive(Properties, PartialEq)]
 pub struct Props {
     pub block_number: Option<BlockNumber>,
-    pub visible: bool
+    pub visible: bool,
 }
 
 pub struct BlockTimer {
@@ -74,7 +74,7 @@ impl Component for BlockTimer {
             Some("hidden")
         };
         html! {
-            <span class={classes!("countdown", visible_class)}>{"countdown: "}<b>{format!(" {}.{}s", self.seconds, self.milliseconds)}</b></span>
+            <span class={classes!("countdown", visible_class)}>{"timer: "}<b>{format!(" {}.{}s", self.seconds, self.milliseconds)}</b></span>
         }
     }
 }

@@ -337,10 +337,22 @@ footer .caption {
 .is__on.match__0 > .corespace:nth-child(1),
 .is__on.match__1 > .corespace:nth-child(2),
 .is__on.match__2 > .corespace:nth-child(3),
-.is__on.match__3 > .corespace:nth-child(4) {
+.is__on.match__3 > .corespace:nth-child(4),
+.is__on.match__4 > .corespace:nth-child(5),
+.is__on.match__5 > .corespace:nth-child(6),
+.is__on.match__6 > .corespace:nth-child(7),
+.is__on.match__7 > .corespace:nth-child(8),
+.is__on.match__8 > .corespace:nth-child(9),
+.is__on.match__9 > .corespace:nth-child(10),
+.is__on.match__10 > .corespace:nth-child(11),
+.is__on.match__11 > .corespace:nth-child(12),
+.is__on.match__12 > .corespace:nth-child(13),
+.is__on.match__13 > .corespace:nth-child(14),
+.is__on.match__14 > .corespace:nth-child(15),
+.is__on.match__15 > .corespace:nth-child(16) {
     box-shadow:
-        var(--color-yellow) 0px 1px 2px,
-        var(--color-yellow) 0px 0px 0px 2px;
+        var(--color-shadow) 0px 1px 2px,
+        var(--color-shadow) 0px 0px 0px 2px;
 }
 
 .corespace:hover {
@@ -408,7 +420,7 @@ footer .caption {
 }
 
 .corespace.help {
-    background-color: var(--color-yellow-lighter);
+    background-color: var(--color-black);
 }
 
 .core {
@@ -594,7 +606,7 @@ footer .caption {
     justify-content: center;
     position: absolute;
     top: 3rem;
-    height: calc(12 * 10 * 1px);
+    /* height: calc(12 * 10 * 1px); */
 }
 
 .column__info.left {
@@ -630,7 +642,7 @@ footer .caption {
 .score__info {
     position: absolute;
     top: 0;
-    left: 2em;
+    right: 2em;
 }
 
 .score__info > span {
