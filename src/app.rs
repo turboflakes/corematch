@@ -805,6 +805,23 @@ impl App {
         }
     }
 
+    fn keyboard_view(&self, link: &Scope<Self>) -> Html {
+        let visible_class = if self.is_game_on() {
+            Some("visible")
+        } else {
+            Some("hidden")
+        };
+        html! {
+            <span class={classes!("keyboard__info", visible_class)}>
+                <span>{"S=START"}</span>
+                <span>{"H=HIGHLIGHT"}</span>
+                <span>{"F=FLIP"}</span>
+                <span>{"UP/DOWN/LEFT/RIGHT=MOVE"}</span>
+                <span>{"SPACE=SELECT & MATCH"}</span>
+            </span>
+        }
+    }
+
     fn block_countdown_view(&self, _link: &Scope<Self>) -> Html {
         // reset countdown every time a new block is added to the board
         let block_number = if let Some(opt) = self.blocks.get(0) {
@@ -882,6 +899,7 @@ impl App {
             _ => html! {
                 <>
                     { self.score_view(link) }
+                    { self.keyboard_view(link) }
                     // { self.base_points_view(link) }
                     { self.attempts_column_view(link) }
                     { self.helps_column_view(link) }
@@ -989,30 +1007,29 @@ impl App {
             <div class={classes!("game__about")}>
                 <h6>{"What is this?"}</h6>
                 <p>{"Corematch is a memory game where players must spot a matching pattern to earn points.
-                    The board game holds a maximum of sixteen square objects ― "}<b><i>{"Boxes"}</i></b>{" ― arranjed in a 4x4 matrix."}</p>
+                    The board game holds a maximum of sixteen square objects ― "}<b><i>{"Cards"}</i></b>{" ― arranjed in a 4x4 matrix."}</p>
                 <h6>{"Where does the pattern come from?"}</h6>
                 <p>{"The pattern is crafted from the Polkadot decentralized multi-core architecture. Depending on the selected chain, the pattern reflects the "}
                     <a class="link" href="https://wiki.polkadot.network/docs/polkadot-direction#core-usage-in-polkadot-10" target="_blank">{"core usage"}</a>
                     {" of either Polkadot or Kusama protocol on every finalized block."}
                 </p>
-                <p>{"Each box represents a finalized block, engraved with the number of cores available on chain, where each core is colored based on its usage.
+                <p>{"Each card represents a finalized block, engraved with the top 49 cores available on chain, where each core is colored based on its usage. Note, in the case of Kusama, the top 64 cores are used.
                     In the current version - Polkadot v1.0, each core can only exist in two states: empty or full."}</p>
                 <h6>{"What are the game rules?"}</h6>
-                <p>{"The mission is to earn as many points as possible by spotting one or more matches between the predefined box and the others in 6 seconds.
+                <p>{"The mission is to earn as many points as possible by spotting one or more matches between the first selected card and the others in 6 seconds.
                     If there is more than a pair, points are powered up.
-                    However, a wrong box selection leads to a loss, and the game concludes if you make four incorrect selections."}</p>
+                    However, a wrong card selection leads to a loss, and the game concludes if you make four incorrect selections."}</p>
                 <h6>{"How to play?"}</h6>
                 <p>{"You can play using either the mouse or the keyboard. If you opt for the mouse, double-click the left mouse button on top of the spotted matching box.
-                    Alternatively, if you choose the keyboard, move around the selected box with the arrow keys and press 'enter' when you spot a matching one."}</p>
-                <p>{"You can start playing by pressing the 'S' key or the button "}
+                    Alternatively, if you choose the keyboard, move around the selected box with the arrow keys and press 'Enter' or 'Space' key when you spot a matching one."}</p>
+                <p>{"You can start playing by pressing the 'S' or 'Enter' key or the button "}
                     <span><img class="icon__img" src="/images/start_icon.svg" alt="start_game" /></span>
-                    {". During gameplay, you can make use of four helps by pressing the 'H' key or the button "}
+                    {". During gameplay, you can make use of eight helps by pressing the 'H' key or the button "}
                     <span><img class="icon__img" src="/images/match_icon.svg" alt="show_matches" /></span>
-                    {", which highlights up to four matches to assist you in spotting them on time."}</p>
-                <p>{"The box to be matched can be changed by pressing the numeric keys '1-4', with each selection yielding different points."}</p>
+                    {", which highlights up to eight matches to assist you in spotting them on time."}</p>
                 <p>{"There are currently two levels at play: Level 1 is a multi-core binary representation of the network core usage.
                     Level 2 is a multi-core colorful representation based on parachain Ids and their respective core assignment.
-                    Level 2 is available as soon as a minimum of 64 points are reached and you can switch bettwen levels by pressing the respective level buttons "}
+                    Level 2 is available as soon as a minimum of 32 points are reached and you can switch bettwen levels by pressing the respective level buttons "}
                     <span><img class="icon__img" src="/images/level1_icon.svg" alt="level 1" /></span>{" "}
                     <span><img class="icon__img" src="/images/level2_icon.svg" alt="level 2" /></span>
                 </p>

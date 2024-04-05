@@ -291,7 +291,7 @@ pub fn block(props: &Props) -> Html {
                     );
                     html! {
                         <div class={classes!("palette")}>
-                            <span class="label">{ "core usage" }</span>
+                            <span class="label">{ "usage" }</span>
                             <span class="details">{ core_usage }</span>
                             <span class="label">{ "finalized block" }</span>
                             <span class="details">{ block_number }</span>

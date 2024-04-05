@@ -645,14 +645,22 @@ footer .caption {
     right: 2em;
 }
 
-.score__info > span {
-    font-size: var(--font-size-x-small);
-    margin-right: 1em;
-}
-
 .base_points__info {
     font-size: var(--font-size-small);
     position: absolute;
     top: 0;
     right: 1em;
+}
+
+.keyboard__info {
+    position: absolute;
+    bottom: 0;
+    left: 2em;
+    text-wrap: nowrap;
+}
+
+.keyboard__info > span,
+.score__info > span {
+    font-size: var(--font-size-x-small);
+    margin-right: 1em;
 }
