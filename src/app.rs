@@ -734,9 +734,13 @@ impl App {
         let play_again_onclick = link.callback(move |_| Msg::StartButtonClicked);
         let mint_onclick = link.callback(move |_| Msg::MintButtonClicked);
         let data = self.share_message().unwrap_or_default();
+        let game_results = self.game_results().unwrap_or_default();
         html! {
             <div class="gameover">
                 <img class="corematch__icon" src="/images/corematch_icon_animated_gameover.svg" alt="corematch icon animated" />
+                <div class="score">
+                    <span>{"SCORE: "}<b>{game_results}</b></span>
+                </div>
                 <div class="action">
                     <ActionButton label={"play again"} disable={false} onclick={play_again_onclick}>
                         <img class="icon" src="/images/start_icon_white_clear.svg" alt="start_icon" />
@@ -809,12 +813,12 @@ impl App {
         if self.is_game_on() {
             html! {
                 <span class={classes!("keyboard__info", "visible")}>
-                    <span>{"UP/DOWN/LEFT/RIGHT=MOVE"}</span>
+                    <span>{"← ↑ → ↓ =MOVE"}</span>
                     {
                         if self.get_match_index().is_none() {
-                            html! { <span>{"SPACE=SELECT"}</span> }
+                            html! { <span>{"SPACE/ENTER=SELECT"}</span> }
                         } else {
-                            html! { <span>{"SPACE=MATCH"}</span> }
+                            html! { <span>{"SPACE/ENTER=MATCH"}</span> }
                         }
                     }
                     <span>{"H=HIGHLIGHT"}</span>
@@ -1389,7 +1393,7 @@ impl App {
         let game_results = self.game_results().unwrap_or_default();
         if let Some(block) = &self.previous_match_block {
             let mut data = Vec::new();
-            data.push(format!("■□ corematch.io {}\n", game_results));
+            data.push(format!("corematch.io {} 👀\n", game_results));
             data.push(block.runtime.hashtag());
             Some(data.join("\n").into())
         } else {

@@ -89,7 +89,7 @@ pub fn button(props: &ShareButtonProps) -> Html {
     html! {
         <div class="share">
             <ActionButton label={props.label.clone()} disable={false} {onclick} >{props.children.clone()}</ActionButton>
-            <span class={classes!("clipboard__message", *optional_class)}>{"results copied to clipboard"}</span>
+            <span class={classes!("clipboard__message", *optional_class)}>{"score copied to clipboard"}</span>
         </div>
     }
 }

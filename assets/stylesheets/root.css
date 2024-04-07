@@ -56,7 +56,7 @@
     --content-size: calc(var(--gameboard-size) + var(--gameboard-size) * 0.125);
     --corespace-size: calc(
         var(--gameboard-size) / var(--matrix-size) - var(--gameboard-size) /
-            var(--matrix-size) * 0.04
+            var(--matrix-size) * 0.05
     );
     /* polkadot */
     --core-polkadot: calc(
@@ -78,20 +78,16 @@
     --font-size-xx-small: 60%;
     --font-size-large: 105%;
     --font-size-x-large: 110%;
-    /* --font-size-xx-large: 115%;
-  --font-size-xxx-large: 125%;
-  --font-size-xxxx-large: 140%; */
 
     @media (orientation: landscape) {
         --gameboard-size: calc(60vh);
         --font-size: calc(1em + 1vh);
-        /* --font-size: calc(1em + 0.5vh); */
-        /* --font-size-x-small: 50%;
-    --font-size-small: 65%;
-    --font-size-large: 110%;
-    --font-size-x-large: 120%;
-    --font-size-xx-large: 130%;
-    --font-size-xxx-large: 150%;
-    --font-size-xxxx-large: 180%; */
+    }
+
+    @media (max-width: 550px) {
+        --corespace-size: calc(
+        var(--gameboard-size) / var(--matrix-size) - var(--gameboard-size) /
+            var(--matrix-size) * 0.06
+        );
     }
 }

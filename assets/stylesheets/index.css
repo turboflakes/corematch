@@ -358,8 +358,8 @@ footer .caption {
 .is__on.match__14 > .corespace:nth-child(15),
 .is__on.match__15 > .corespace:nth-child(16) {
     box-shadow:
-        var(--color-shadow) 0px 1px 2px,
-        var(--color-shadow) 0px 0px 0px 2px;
+        var(--color-shadow) 0px 1px 3px,
+        var(--color-shadow) 0px 0px 0px 3px;
 }
 
 .corespace:hover {
@@ -497,8 +497,12 @@ footer .caption {
 
 .corematch__icon {
     max-width: calc(var(--gameboard-size) * 0.625);
-    margin: 0 0 2em 0;
+    /* margin: 0 0 2em 0; */
     /* margin-right: 2rem; */
+}
+
+.gameover .action {
+    margin: 1em 0;
 }
 
 .gameover .share {
@@ -506,7 +510,7 @@ footer .caption {
 }
 
 .gameover .btn__link {
-    width: 144px;
+    width: 100px;
     text-transform: uppercase;
     position: relative;
 }
@@ -514,9 +518,9 @@ footer .caption {
 /* .control  */
 .btn__link {
     margin: 0 0.5rem;
-    padding: 0.5rem;
+    padding: 0.25rem;
     background: var(--color-primary);
-    min-width: 108px;
+    min-width: 90px;
     display: flex;
     /* justify-content: space-between; */
     align-items: center;
@@ -734,16 +738,6 @@ footer .caption {
         margin: 1em 0;
     }
 
-    .gameover .btn__link {
-        width: 100px;
-    }
-
-    .btn__link {
-        margin: 0 0.5rem;
-        padding: 0.25rem;
-        min-width: 90px;
-    }
-
     .btn__link > .label {
         font-size: var(--font-size-small);
     }
@@ -768,7 +762,16 @@ footer .caption {
 }
 
 /* Larger than desktop */
-@media (min-width: 1000px) {}
+@media (min-width: 1000px) {
+    .gameover .btn__link {
+        width: 144px;
+    }
+
+    .btn__link {
+        padding: 0.5rem;
+        min-width: 108px;
+    }
+}
 
 /* Larger than Desktop HD */
 @media (min-width: 1200px) {}
