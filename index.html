@@ -12,17 +12,44 @@
     
     <!--  -->
     <link rel="icon" href="/favicon.ico">
-    <link rel="stylesheet" href="css/normalize.css">
+    <!-- <link rel="stylesheet" href="css/normalize.css" /> -->
     <link rel="stylesheet" href="css/animate.min.css">
-    <link rel="stylesheet" href="/root-cd6ea1818126acf7.css">
+    <link rel="stylesheet" href="/root-cb477516e4347437.css">
     <link rel="stylesheet" href="/fonts-df9d459f699e7608.css">
     <link rel="stylesheet" href="/elements-91a7d41b51eafb24.css">
-    <link rel="stylesheet" href="/index-d4959bdcf32c435.css">
+    <link rel="stylesheet" href="/index-ede6a8fa215e4629.css">
     <script src="/index-348e29a073b589a8.js"></script>
   
-<link rel="preload" href="/corematch-76380c1681e21aae_bg.wasm" as="fetch" type="application/wasm" crossorigin="">
-<link rel="modulepreload" href="/corematch-76380c1681e21aae.js"></head>
+<link rel="preload" href="/corematch-8d1810b6ad93613e_bg.wasm" as="fetch" type="application/wasm" crossorigin="">
+<link rel="modulepreload" href="/corematch-8d1810b6ad93613e.js"></head>
   <body>
   
 
-<script type="module">import init from '/corematch-76380c1681e21aae.js';init('/corematch-76380c1681e21aae_bg.wasm');</script></body></html>
+<script type="module">import init from '/corematch-8d1810b6ad93613e.js';init('/corematch-8d1810b6ad93613e_bg.wasm');</script><script>(function () {
+    var protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    var url = protocol + '//' + window.location.host + '/_trunk/ws';
+    var poll_interval = 5000;
+    var reload_upon_connect = () => {
+        window.setTimeout(
+            () => {
+                // when we successfully reconnect, we'll force a
+                // reload (since we presumably lost connection to
+                // trunk due to it being killed, so it will have
+                // rebuilt on restart)
+                var ws = new WebSocket(url);
+                ws.onopen = () => window.location.reload();
+                ws.onclose = reload_upon_connect;
+            },
+            poll_interval);
+    };
+
+    var ws = new WebSocket(url);
+    ws.onmessage = (ev) => {
+        const msg = JSON.parse(ev.data);
+        if (msg.reload) {
+            window.location.reload();
+        }
+    };
+    ws.onclose = reload_upon_connect;
+})()
+</script></body></html>
