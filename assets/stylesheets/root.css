@@ -20,6 +20,7 @@
     --color-background: hsl(var(--hsl-200));
     --color-background-darker: hsl(var(--hsl-600));
     --color-content: hsl(var(--hsl-100));
+    --color-select: hsl(var(--hsl-600));
     --color-shadow: hsl(var(--hsl-800));
     --color-shadow-lighter: hsl(var(--hsl-300));
     --color-border: hsl(var(--hsl-200));
@@ -34,6 +35,15 @@
     --color-red: hsl(var(--hsl-red));
     --color-white: hsl(var(--hsl-100));
     --color-black: hsl(var(--hsl-900));
+    --color-base-900: hsl(var(--hsl-900));
+    --color-base-800: hsl(var(--hsl-800));
+    --color-base-700: hsl(var(--hsl-700));
+    --color-base-600: hsl(var(--hsl-600));
+    --color-base-500: hsl(var(--hsl-500));
+    --color-base-400: hsl(var(--hsl-400));
+    --color-base-300: hsl(var(--hsl-300));
+    --color-base-200: hsl(var(--hsl-200));
+    --color-base-100: hsl(var(--hsl-100));
     /*  */
     --rgb-polkadot: 230 0 122;
     --rgb-kusama: 0 0 0;

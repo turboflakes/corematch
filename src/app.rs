@@ -699,7 +699,7 @@ impl App {
         html! {
             <>
                 <div class="container">
-                    <div class="content__wrapper">
+                    // <div class="content__wrapper">
                         <div class="content__menu">
                             { self.head_left_view(link) }
                             // { self.head_right_view(link) }
@@ -724,7 +724,7 @@ impl App {
                             </div>
                         </div>
                         { self.footer_view() }
-                    </div>
+                    // </div>
                 </div>
             </>
         }
@@ -1042,21 +1042,21 @@ impl App {
             <div class={classes!("game__about")}>
                 <h6>{"What is this?"}</h6>
                 <p>{"Corematch is a memory game where players must spot a matching pattern to earn points.
-                    The board game holds a maximum of sixteen square objects ― "}<b><i>{"Cards"}</i></b>{" ― arranjed in a 4x4 matrix."}</p>
+                    The board game holds a maximum of sixteen square objects ― "}<b><i>{"Cells"}</i></b>{" ― arranjed in a 4x4 matrix."}</p>
                 <h6>{"Where does the pattern come from?"}</h6>
                 <p>{"The pattern is crafted from the Polkadot decentralized multi-core architecture. Depending on the selected chain, the pattern reflects the "}
                     <a class="link" href="https://wiki.polkadot.network/docs/polkadot-direction#core-usage-in-polkadot-10" target="_blank">{"core usage"}</a>
                     {" of either Polkadot or Kusama protocol on every finalized block."}
                 </p>
-                <p>{"Each card represents a finalized block, engraved with the top 49 cores available on chain, where each core is colored based on its usage. Note, in the case of Kusama, the top 64 cores are used.
+                <p>{"Each cell represents a finalized block, engraved with the top 49 cores (on Polkadot, top 64 cores on Kusama) available on chain, where each core is colored based on its usage.
                     In the current version - Polkadot v1.0, each core can only exist in two states: empty or full."}</p>
                 <h6>{"What are the game rules?"}</h6>
-                <p>{"The mission is to earn as many points as possible by spotting one or more matches between the first selected card and the others in 6 seconds.
+                <p>{"The mission is to earn as many points as possible by spotting one or more matches between the first selected cell and the others in 6 seconds.
                     If there is more than a pair, points are powered up.
-                    However, a wrong card selection leads to a loss, and the game concludes if you make four incorrect selections."}</p>
+                    However, a wrong cell selection leads to a loss, and the game concludes if you make four incorrect selections."}</p>
                 <h6>{"How to play?"}</h6>
-                <p>{"You can play using either the mouse or the keyboard. If you opt for the mouse, double-click the left mouse button on top of the spotted matching box.
-                    Alternatively, if you choose the keyboard, move around the selected box with the arrow keys and press 'Enter' or 'Space' key when you spot a matching one."}</p>
+                <p>{"You can play using either the mouse, keyboard or touch. If you opt for the mouse, double-click the left mouse button on top of the spotted matching cell.
+                    Alternatively, if you choose the keyboard, move around the selected cell with the arrow keys and press 'Enter' or 'Space' key when you spot a matching one."}</p>
                 <p>{"You can start playing by pressing the 'S' or 'Enter' key or the button "}
                     <span><img class="icon__img" src="/images/start_icon.svg" alt="start_game" /></span>
                     {". During gameplay, you can make use of eight helps by pressing the 'H' key or the button "}
