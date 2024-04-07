@@ -699,32 +699,30 @@ impl App {
         html! {
             <>
                 <div class="container">
-                    // <div class="content__wrapper">
-                        <div class="content__menu">
-                            { self.head_left_view(link) }
-                            // { self.head_right_view(link) }
+                    <div class="content__menu">
+                        { self.head_left_view(link) }
+                        // { self.head_right_view(link) }
+                    </div>
+                    <div class="content__body">
+                        <div class="cb__left">
+                        //     { self.left_top_view(link) }
+                        //     { self.left_bottom_view(link) }
                         </div>
-                        <div class="content__body">
-                            <div class="cb__left">
-                            //     { self.left_top_view(link) }
-                            //     { self.left_bottom_view(link) }
-                            </div>
-                            <div class="cb__middle">
-                                {
-                                    match self.board_status {
-                                        BoardStatus::About => { html! {  self.about_view(link) } }
-                                        BoardStatus::Options => { html! {  self.options_view(link) } }
-                                        BoardStatus::Account => { html! {  self.accounts_view(link) } }
-                                        _ => { self.game_view(link) }
-                                    }
+                        <div class="cb__middle">
+                            {
+                                match self.board_status {
+                                    BoardStatus::About => { html! {  self.about_view(link) } }
+                                    BoardStatus::Options => { html! {  self.options_view(link) } }
+                                    BoardStatus::Account => { html! {  self.accounts_view(link) } }
+                                    _ => { self.game_view(link) }
                                 }
-                            </div>
-                            <div class="cb__right">
-                                { self.right_top_view(link) }
-                            </div>
+                            }
                         </div>
-                        { self.footer_view() }
-                    // </div>
+                        <div class="cb__right">
+                            { self.right_top_view(link) }
+                        </div>
+                    </div>
+                    { self.footer_view() }
                 </div>
             </>
         }
@@ -1151,8 +1149,8 @@ impl App {
         html! {
             <footer class="footer">
                 <div>
-                    <div class="caption">{"Built by Turboflakes // Unstoppable by Polkadot"}</div>
-                    <div class="caption">{"Corematch © 2024 Turboflakes"}</div>
+                    // <div class="caption">{"Built by Turboflakes // Unstoppable by Polkadot"}</div>
+                    <div class="caption">{"© 2024 Corematch built by Turboflakes"}</div>
                 </div>
                 <div class="footer__icons">
                     <a class="logo" href="https://turboflakes.io" target="_blank">

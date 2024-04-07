@@ -1,6 +1,7 @@
 body {
-    background: radial-gradient(hsla(186, 33%, 94%, 0.6) 0%, hsla(216, 41%, 79%, 0.6) 100%),
-    url('/images/noise.svg');
+    margin: 0;
+    padding: 0;
+    background: radial-gradient(hsla(186, 33%, 94%, 1) 0%, hsla(216, 41%, 79%, 1) 100%);
     /* background-color: var(--color-background); */
     /* background-color: var(--color-tmp); */
     /* background: linear-gradient(270deg,#FFFFFF,rgb(230 234 246));
@@ -47,11 +48,11 @@ body {
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    height: 98vh;
+    height: 100vh;
 }
 
 .header {
-    margin: 2em 0 1em 0;
+    margin: 2em 0 0 0;
 }
 
 .header > .corematch__logo {
@@ -68,11 +69,11 @@ body {
 }
 
 footer {
-    margin: 1em 2em 0.5em 2em;
+    padding: 0.5em;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: var(--content-size);
+    width: 100%;
 }
 
 footer .caption {
@@ -451,7 +452,7 @@ footer .caption {
 .corespace.disabled.polkadot,
 .corespace.disabled.kusama,
 .corespace.disabled > .core {
-    opacity: 0.4;
+    opacity: 0.2;
 }
 
 .corespace.polkadot .core {
@@ -737,10 +738,6 @@ footer .caption {
         font-size: var(--font-size-xx-small);
     }
 
-    footer {
-        margin: 1em 0 0.4em 0;
-    }
-
     .btn__link > .label {
         font-size: var(--font-size-small);
     }
@@ -761,6 +758,15 @@ footer .caption {
         width: 0.4em;
         height: 0.4em;
         margin: calc(var(--gameboard-size) * 0.01);
+    }
+
+    .gameover .btn__link {
+        width: 124px;
+    }
+
+    .btn__link {
+        padding: 0.5rem;
+        min-width: 100px;
     }
 }
 
