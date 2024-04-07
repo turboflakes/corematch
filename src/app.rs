@@ -706,8 +706,8 @@ impl App {
                         </div>
                         <div class="content__body">
                             <div class="cb__left">
-                                { self.left_top_view(link) }
-                                { self.left_bottom_view(link) }
+                            //     { self.left_top_view(link) }
+                            //     { self.left_bottom_view(link) }
                             </div>
                             <div class="cb__middle">
                                 {
@@ -796,10 +796,10 @@ impl App {
         };
         html! {
             <span class={classes!("score__info", visible_class)}>
-                <span>{"points: "} <b>{format!("{} ", self.points)}</b></span>
-                <span>{"duration: "} <b>{format!("{} ", self.duration)}</b></span>
-                <span>{"attempts: "} <b>{format!("{} ", self.tries)}</b></span>
-                <span>{"helps: "} <b>{format!("{} ", self.helps)}</b></span>
+                <span>{"Points: "} <b>{format!("{} ", self.points)}</b></span>
+                <span>{"Duration: "} <b>{format!("{} ", self.duration)}</b></span>
+                <span>{"Attempts: "} <b>{format!("{} ", self.tries)}</b></span>
+                <span>{"Helps: "} <b>{format!("{} ", self.helps)}</b></span>
                 { self.block_countdown_view(link)}
             </span>
         }
@@ -809,8 +809,6 @@ impl App {
         if self.is_game_on() {
             html! {
                 <span class={classes!("keyboard__info", "visible")}>
-                    <span>{"H=HIGHLIGHT"}</span>
-                    <span>{"F=FLIP"}</span>
                     <span>{"UP/DOWN/LEFT/RIGHT=MOVE"}</span>
                     {
                         if self.get_match_index().is_none() {
@@ -819,12 +817,14 @@ impl App {
                             html! { <span>{"SPACE=MATCH"}</span> }
                         }
                     }
+                    <span>{"H=HIGHLIGHT"}</span>
+                    <span>{"F=FLIP"}</span>
                 </span>
             }
         } else {
             html! {
                 <span class={classes!("keyboard__info", "visible")}>
-                    <span>{"S=START"}</span>
+                    <span>{"Press S or ENTER to start playing"}</span>
                 </span>
             }
         }
@@ -941,7 +941,20 @@ impl App {
     fn head_left_view(&self, _link: &Scope<Self>) -> Html {
         html! {
             <div class="header">
-                <img class="corematch__logo" src="/images/corematch_logo_full.svg" alt="corematch logo" />
+                {
+                    match self.network_state.runtime {
+                        SupportedRelayRuntime::Polkadot => {
+                            html! {
+                                <img class="corematch__logo" src="/images/corematch_logo_polkadot.svg" alt="corematch + polkadot logo" />
+                            }
+                        }
+                        SupportedRelayRuntime::Kusama => {
+                            html! {
+                                <img class="corematch__logo" src="/images/corematch_logo_kusama.svg" alt="corematch + kusama logo" />
+                            }
+                        }
+                    }
+                }
             </div>
         }
     }
@@ -976,6 +989,14 @@ impl App {
     }
 
     fn left_bottom_view(&self, link: &Scope<Self>) -> Html {
+        html! {
+            <div class="bottom">
+                { self.subscription_icon_view(link) }
+            </div>
+        }
+    }
+
+    fn subscription_icon_view(&self, link: &Scope<Self>) -> Html {
         let network_state = self.network_state.clone();
         let network_onclick = link.callback(move |e| Msg::NetworkButtonClicked(e));
 
@@ -986,22 +1007,20 @@ impl App {
         };
 
         html! {
-            <div class="bottom">
-                <SubscriptionProvider>
-                    { match network_state.runtime {
-                        SupportedRelayRuntime::Polkadot => html! {
-                            <NetworkButton switch_to="kusama" class={visible_class} onclick={network_onclick.clone()} >
-                                <img class="icon__img" src="/images/kusama_icon.svg" alt="kusama logo" />
-                            </NetworkButton>
-                        },
-                        SupportedRelayRuntime::Kusama => html! {
-                            <NetworkButton switch_to="polkadot" class={visible_class} onclick={network_onclick.clone()} >
-                                <img class="icon__img" src="/images/polkadot_icon_white.svg" alt="polkadot logo" />
-                            </NetworkButton>
-                        }
-                    }}
-                </SubscriptionProvider>
-            </div>
+            <SubscriptionProvider>
+                { match network_state.runtime {
+                    SupportedRelayRuntime::Polkadot => html! {
+                        <NetworkButton switch_to="kusama" class={visible_class} onclick={network_onclick.clone()} >
+                            <img class="icon__img" src="/images/kusama_icon.svg" alt="kusama logo" />
+                        </NetworkButton>
+                    },
+                    SupportedRelayRuntime::Kusama => html! {
+                        <NetworkButton switch_to="polkadot" class={visible_class} onclick={network_onclick.clone()} >
+                            <img class="icon__img" src="/images/polkadot_icon_white.svg" alt="polkadot logo" />
+                        </NetworkButton>
+                    }
+                }}
+            </SubscriptionProvider>
         }
     }
 
@@ -1105,6 +1124,9 @@ impl App {
                 <IconButton disable={false} onclick={about_click}>
                     <img class="icon__img"  src="/images/question_icon.svg" alt="game_info" title="About Corematch" />
                 </IconButton>
+
+                { self.subscription_icon_view(link) }
+
             </div>
         }
     }

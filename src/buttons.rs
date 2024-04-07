@@ -129,9 +129,9 @@ pub fn button(props: &NetworkButtonProps) -> Html {
     let _label = format!("switch to {}", props.switch_to.clone());
 
     html! {
-        <div class={classes!("btn__icon", optional_class)} {onclick} >
+        <button class={classes!("btn__icon", optional_class)} {onclick} >
             {props.children.clone()}
-        </div>
+        </button>
     }
 }
 

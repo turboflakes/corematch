@@ -51,12 +51,11 @@ body {
 }
 
 .header {
-    margin-left: 2em;
-    align-self: end;
+    margin-bottom: 1em;
 }
 
 .header > .corematch__logo {
-    max-width: calc(var(--gameboard-size) * 0.625);
+    max-width: calc(var(--gameboard-size));
     margin-bottom: 0;
 }
 
@@ -69,7 +68,7 @@ body {
 }
 
 footer {
-    margin: 1em 3em;
+    margin: 1em 2em;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -77,6 +76,13 @@ footer {
 
 footer .caption {
     color: var(--color-base);
+    font-size: var(--font-size-small);
+}
+
+@media (orientation: portrait) {
+    footer .caption {
+        font-size: var(--font-size-xx-small);
+    }
 }
 
 .footer__icons {
@@ -88,12 +94,12 @@ footer .caption {
     color: var(--color-base);
 }
 
-.caption {
+/* .caption {
     font-size: var(--font-size-small);
-}
+} */
 
 .logo {
-    margin: 0 0.5rem;
+    margin: 0 0.75rem;
     display: flex;
     align-items: center;
 }
@@ -127,7 +133,7 @@ footer .caption {
 
 .content__menu {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: flex-start;
 }
 
@@ -153,16 +159,17 @@ footer .caption {
     flex-direction: column;
     justify-content: space-between;
     margin: 1em 0;
+    min-width: 50px;
 }
 
 .content__body > .cb__left > .top {
     display: flex;
-    justify-content: flex-end;
-    margin-right: 0.4em;
+    justify-content: center;
 }
 
 .content__body > .cb__left > .bottom {
-    margin-right: 0.4em;
+    display: flex;
+    justify-content: center;
 }
 
 .content__body > .cb__right {
@@ -170,12 +177,12 @@ footer .caption {
     flex-direction: column;
     justify-content: space-between;
     margin: 1em 0;
+    min-width: 50px;
 }
 
 .content__body > .cb__right > .top {
     display: flex;
-    justify-content: flex-end;
-    margin-left: 0.4em;
+    justify-content: center;
 }
 
 .logo__polkadot > img,
@@ -523,7 +530,7 @@ footer .caption {
 
 .btn__link > .label {
     color: var(--color-white);
-    font-size: var(--font-size-small);
+    font-size: var(--font-size-large);
     width: 100%;
 }
 
@@ -547,7 +554,7 @@ footer .caption {
 }
 
 .btn__icon {
-    margin: 0.5rem 0;
+    margin: 0.75rem 0;
     width: 28px;
     height: 28px;
     position: relative;
@@ -618,10 +625,10 @@ footer .caption {
 }
 
 .column__info > .box {
-    width: 0.5rem;
-    height: 0.5rem;
+    width: 0.5em;
+    height: 0.5em;
     display: inline-block;
-    margin: 0.5rem;
+    margin: calc(var(--gameboard-size) * 0.01);
     border: 1px solid var(--color-primary);
     border-radius: 1px;
 }
@@ -642,7 +649,7 @@ footer .caption {
 .score__info {
     position: absolute;
     top: 0;
-    right: 2em;
+    margin: 0 auto;
 }
 
 .base_points__info {
@@ -664,3 +671,104 @@ footer .caption {
     font-size: var(--font-size-x-small);
     margin-right: 1em;
 }
+
+.keyboard__info > span:last-child,
+.score__info > span:last-child {
+    margin-right: 0;
+}
+
+@media (orientation: portrait) {
+
+    .content__body {
+        flex-direction: column;
+    }
+
+    .content__body > .cb__left {
+        display: none;
+    }
+
+    .content__body > .cb__right {
+        margin: 0;
+    }
+
+    .game__commands {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .btn__icon {
+        margin: 0.75rem;
+        min-height: 50px;
+    }
+
+    .btn__icon:first-child {
+        margin-top: 0.5rem;
+    }
+
+}
+
+/* The input of touch-enabled devices does not hover over elements  */
+@media (hover: none) {
+    .keyboard__info {
+        display: none;
+    }
+}
+
+/* Smaller than phablet */
+@media (max-width: 550px) {
+     .score__info {
+        top: -0.4em;
+    }
+
+    .column__info > .box {
+        width: 0.25em;
+        height: 0.25em;
+        margin: calc(var(--gameboard-size) * 0.005) 0;
+    }
+
+    .score__info > span {
+        font-size: var(--font-size-xx-small);
+    }
+
+    footer {
+        margin: 1em 0;
+    }
+
+    .gameover .btn__link {
+        width: 100px;
+    }
+
+    .btn__link {
+        margin: 0 0.5rem;
+        padding: 0.25rem;
+        min-width: 90px;
+    }
+
+    .btn__link > .label {
+        font-size: var(--font-size-small);
+    }
+}
+
+/* Larger than phablet (also point when grid becomes active) */
+@media (min-width: 550px) {
+    .column__info > .box {
+        width: 0.3em;
+        height: 0.3em;
+        margin: calc(var(--gameboard-size) * 0.01);
+    }
+}
+
+/* Larger than tablet */
+@media (min-width: 750px) {
+    .column__info > .box {
+        width: 0.4em;
+        height: 0.4em;
+        margin: calc(var(--gameboard-size) * 0.01);
+    }
+}
+
+/* Larger than desktop */
+@media (min-width: 1000px) {}
+
+/* Larger than Desktop HD */
+@media (min-width: 1200px) {}

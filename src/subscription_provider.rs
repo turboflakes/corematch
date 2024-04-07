@@ -193,10 +193,6 @@ impl Component for SubscriptionProvider {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        html! {
-            <div>
-                {ctx.props().children.clone()}
-            </div>
-        }
+        html! {{ ctx.props().children.clone() }}
     }
 }

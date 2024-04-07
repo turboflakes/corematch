@@ -52,7 +52,7 @@
     --polkadot-size: 7;
     --kusama-size: 8;
 
-    --gameboard-size: calc(75vw);
+    --gameboard-size: calc(85vw);
     --content-size: calc(var(--gameboard-size) + var(--gameboard-size) * 0.125);
     --corespace-size: calc(
         var(--gameboard-size) / var(--matrix-size) - var(--gameboard-size) /
@@ -75,6 +75,7 @@
     --font-size: calc(1em + 1vw);
     --font-size-small: 80%;
     --font-size-x-small: 70%;
+    --font-size-xx-small: 60%;
     --font-size-large: 105%;
     --font-size-x-large: 110%;
     /* --font-size-xx-large: 115%;
