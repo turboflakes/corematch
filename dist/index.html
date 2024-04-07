@@ -17,12 +17,39 @@
     <link rel="stylesheet" href="/root-4901279f5815ad34.css">
     <link rel="stylesheet" href="/fonts-df9d459f699e7608.css">
     <link rel="stylesheet" href="/elements-91a7d41b51eafb24.css">
-    <link rel="stylesheet" href="/index-4d7eccb67f4e2de1.css">
+    <link rel="stylesheet" href="/index-5831e68474dd1a39.css">
     <script src="/index-348e29a073b589a8.js"></script>
   
-<link rel="preload" href="/corematch-874be1e5f4145001_bg.wasm" as="fetch" type="application/wasm" crossorigin="">
-<link rel="modulepreload" href="/corematch-874be1e5f4145001.js"></head>
+<link rel="preload" href="/corematch-1e0259e70c4d156f_bg.wasm" as="fetch" type="application/wasm" crossorigin="">
+<link rel="modulepreload" href="/corematch-1e0259e70c4d156f.js"></head>
   <body>
   
 
-<script type="module">import init from '/corematch-874be1e5f4145001.js';init('/corematch-874be1e5f4145001_bg.wasm');</script></body></html>
+<script type="module">import init from '/corematch-1e0259e70c4d156f.js';init('/corematch-1e0259e70c4d156f_bg.wasm');</script><script>(function () {
+    var protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    var url = protocol + '//' + window.location.host + '/_trunk/ws';
+    var poll_interval = 5000;
+    var reload_upon_connect = () => {
+        window.setTimeout(
+            () => {
+                // when we successfully reconnect, we'll force a
+                // reload (since we presumably lost connection to
+                // trunk due to it being killed, so it will have
+                // rebuilt on restart)
+                var ws = new WebSocket(url);
+                ws.onopen = () => window.location.reload();
+                ws.onclose = reload_upon_connect;
+            },
+            poll_interval);
+    };
+
+    var ws = new WebSocket(url);
+    ws.onmessage = (ev) => {
+        const msg = JSON.parse(ev.data);
+        if (msg.reload) {
+            window.location.reload();
+        }
+    };
+    ws.onclose = reload_upon_connect;
+})()
+</script></body></html>
