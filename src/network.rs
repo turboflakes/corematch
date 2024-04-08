@@ -75,6 +75,10 @@ impl NetworkState {
             false
         }
     }
+
+    pub fn class(&self) -> String {
+        self.runtime.to_string().to_lowercase()
+    }
 }
 
 pub fn generate_parachain_colors(para_ids: ParachainIds) -> ParachainColors {

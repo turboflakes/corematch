@@ -11,7 +11,7 @@ use yew::{
     Context, ContextHandle, Html, Properties,
 };
 
-use crate::runtimes::{polkadot, kusama};
+use crate::runtimes::{kusama, polkadot};
 
 pub const STOP_SIGNAL: &str = "stop";
 pub const CONTINUE_SIGNAL: &str = "continue";

@@ -1,45 +1,6 @@
 body {
     margin: 0;
     padding: 0;
-    background: radial-gradient(hsla(186, 33%, 94%, 1) 0%, hsla(216, 41%, 79%, 1) 100%);
-    /* background-color: var(--color-background); */
-    /* background-color: var(--color-tmp); */
-    /* background: linear-gradient(270deg,#FFFFFF,rgb(230 234 246));
-  background: -moz-linear-gradient(270deg,#FFFFFF,rgb(230 234 246));
-  background: -webkit-linear-gradient(270deg,#FFFFFF,rgb(230 234 246)); */
-
-    /* background:
-    radial-gradient(hsla(186, 33%, 94%, 0.6) 0%, var(--color-tmp) 100%),
-    url('/images/noise.svg'); */
-
-    /* background:
-    radial-gradient(hsla(186, 33%, 94%, 0.6) 0%, hsla(216, 41%, 79%, 0.6) 100%),
-    url('/images/noise.svg'); */
-
-    /* background:
-    radial-gradient(hsla(186, 33%, 94%, 0.6) 0%, hsla(208, 33%, 21%, 0.6) 100%),
-    url('/images/noise.svg'); */
-
-    /* background:
-    linear-gradient(90deg, hsla(24, 100%, 83%, 0.6) 0%, hsla(341, 91%, 68%, 0.6) 100%),
-    url('/images/noise.svg'); */
-
-    /* background:
-    radial-gradient(rgba(255,255,255,.5), rgba(230,234,246,.8)),
-    url('/images/noise.svg'); */
-
-    /* background:
-    linear-gradient(0deg, hsla(313, 39%, 93%, 0.5) 0%, hsla(320, 78%, 79%, 0.5) 50%, hsla(193, 81%, 84%, 0.5) 100%),
-    url('/images/noise.svg'); */
-
-    /* background:
-      linear-gradient(270deg, rgba(255,255,255,.5), rgba(230,234,246,.5)),
-      url('/images/noise.svg'); */
-
-    /* background:
-  radial-gradient(rgba(230,234,246,.5), rgba(0,0,0,.2)),
-    url('/images/noise.svg'); */
-
 }
 
 .container {
@@ -49,6 +10,15 @@ body {
     justify-content: space-between;
     align-items: center;
     height: 100vh;
+}
+
+.container.polkadot {
+    /* background: radial-gradient(hsla(210, 17%, 98%, 1) 0%, hsla(341, 91%, 68%, 1) 100%); */
+    background: linear-gradient(180deg, hsla(210, 17%, 98%, 1), hsla(341, 91%, 68%, 1));
+}
+.container.kusama {
+    /* background: radial-gradient(hsla(210, 17%, 98%, 1) 0%, hsla(208, 7%, 46%, 1) 100%); */
+    background: linear-gradient(180deg, hsla(210, 17%, 98%, 1), hsla(208, 7%, 46%, 1));
 }
 
 .header {

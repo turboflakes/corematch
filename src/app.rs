@@ -698,7 +698,7 @@ impl App {
     fn app_view(&self, link: &Scope<Self>) -> Html {
         html! {
             <>
-                <div class="container">
+                <div class={classes!("container", self.network_state.class())}>
                     <div class="content__menu">
                         { self.head_left_view(link) }
                         // { self.head_right_view(link) }
