@@ -4,7 +4,7 @@
     <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <g id="Desktop" transform="translate(-1464.000000, -102.000000)" fill-rule="nonzero">
             <g id="match_icon" transform="translate(1464.000000, 102.000000)">
-                <rect id="Rectangle" fill="#0F1519" x="0" y="0" width="60" height="60" rx="4"></rect>
+                <rect id="Rectangle" fill="#22262A" x="0" y="0" width="60" height="60" rx="4"></rect>
                 <g id="pair" transform="translate(12.000000, 17.000000)" fill="#FFFFFF">
                     <path d="M20.5,20.5 L20.5,15.5 L-4.5,15.5 L-4.5,20.5 L3.76636676,20.5 L20.5,20.5 Z M5.5,15.5 L5.5,5.5 L-4.5,5.5 L-4.5,15.5 L-1.1934533,15.5 L5.5,15.5 Z M20.5,15.5 L20.5,5.5 L15.5,5.5 L15.5,15.5 L17.1532734,15.5 L20.5,15.5 Z" id="icon" transform="translate(8.000000, 13.000000) rotate(-90.000000) translate(-8.000000, -13.000000) "></path>
                     <path d="M40.5,20.5 L40.5,15.5 L15.5,15.5 L15.5,20.5 L23.7663668,20.5 L40.5,20.5 Z M25.5,15.5 L25.5,5.5 L15.5,5.5 L15.5,15.5 L18.8065467,15.5 L25.5,15.5 Z M40.5,15.5 L40.5,5.5 L35.5,5.5 L35.5,15.5 L37.1532734,15.5 L40.5,15.5 Z" id="icon" transform="translate(28.000000, 13.000000) rotate(-90.000000) translate(-28.000000, -13.000000) "></path>
