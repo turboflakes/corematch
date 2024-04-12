@@ -225,9 +225,9 @@ impl Block {
             .enumerate()
             .map(|(i, core)| {
                 let mut char = if core.para_id.is_some() {
-                    "■".to_string()
+                    "◾".to_string()
                 } else {
-                    "□".to_string()
+                    "◻️".to_string()
                 };
                 if (i as u32 + 1) % self.runtime.columns_size() == 0 {
                     char.push_str("\n");
@@ -298,7 +298,7 @@ pub fn block(props: &Props) -> Html {
                     );
                     html! {
                         <div class={classes!("palette")}>
-                            <span class="label">{ "usage" }</span>
+                            <span class="label">{ "cell usage" }</span>
                             <span class="details">{ core_usage }</span>
                             <span class="label">{ "finalized block" }</span>
                             <span class="details">{ block_number }</span>

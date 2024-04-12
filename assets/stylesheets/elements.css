@@ -1,8 +1,6 @@
-html {
-    font-size: 16px;
-}
-
 body {
+    margin: 0;
+    padding: 0;
     font-family: "Pixel Operator", Courier, monospace;
     line-height: 1.6;
     font-size: var(--font-size);
@@ -39,6 +37,7 @@ b {
 }
 
 p {
+    line-height: 1.4;
     margin-bottom: 1.2rem;
 }
 

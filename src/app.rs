@@ -740,7 +740,7 @@ impl App {
                     <span>{"SCORE: "}<b>{game_results}</b></span>
                 </div>
                 <div class="action">
-                    <ActionButton label={"play again"} disable={false} onclick={play_again_onclick}>
+                    <ActionButton label={"play"} disable={false} onclick={play_again_onclick}>
                         <img class="icon" src="/images/start_icon_white_clear.svg" alt="start_icon" />
                     </ActionButton>
                     <ShareButton label={"share"} data={data.clone()}>
@@ -1038,26 +1038,26 @@ impl App {
     fn about_view(&self, link: &Scope<Self>) -> Html {
         html! {
             <div class={classes!("game__about")}>
-                <h6>{"What is this?"}</h6>
-                <p>{"Corematch is a memory game where players must spot a matching pattern to earn points.
-                    The board game holds a maximum of sixteen square objects ― "}<b><i>{"Cells"}</i></b>{" ― arranjed in a 4x4 matrix."}</p>
-                <h6>{"Where does the pattern come from?"}</h6>
-                <p>{"The pattern is crafted from the Polkadot decentralized multi-core architecture. Depending on the selected chain, the pattern reflects the "}
-                    <a class="link" href="https://wiki.polkadot.network/docs/polkadot-direction#core-usage-in-polkadot-10" target="_blank">{"core usage"}</a>
-                    {" of either Polkadot or Kusama protocol on every finalized block."}
+                <h6>{"What is Corematch?"}</h6>
+                <p>{"Is an unstoppable memory game where players must spot a matching pattern to earn points. 
+                    The board game holds a maximum of sixteen square objects, organized in a 4x4 matrix named “"} <b><i>{"Cells"}</i></b>{"”."}
                 </p>
-                <p>{"Each cell represents a finalized block, engraved with the top 49 cores (on Polkadot, top 64 cores on Kusama) available on chain, where each core is colored based on its usage.
+                <h6>{"Where does the pattern come from?"}</h6>
+                <p>{"The pattern is crafted depending on the selected chain, and reflects the "} 
+                <a class="link" href="https://wiki.polkadot.network/docs/polkadot-direction#core-usage-in-polkadot-10" target="_blank">{"core usage"}</a>
+                    {" of either Polkadot or Kusama multi-core protocol on every finalized block."}
+                </p>
+                <p>{"Each cell represents a finalized block, engraved with the top 49 cores (on Polkadot, top 64 cores on Kusama) available on-chain; each core is colored based on its usage.
                     In the current version - Polkadot v1.0, each core can only exist in two states: empty or full."}</p>
                 <h6>{"What are the game rules?"}</h6>
                 <p>{"The mission is to earn as many points as possible by spotting one or more matches between the first selected cell and the others in 6 seconds.
-                    If there is more than a pair, points are powered up.
-                    However, a wrong cell selection leads to a loss, and the game concludes if you make four incorrect selections."}</p>
+                    If there is more than a pair, points are powered up. However, a wrong cell selection leads to a loss, and the game concludes if you make four incorrect selections."}</p>
                 <h6>{"How to play?"}</h6>
                 <p>{"You can play using either the mouse, keyboard or touch. If you opt for the mouse, double-click the left mouse button on top of the spotted matching cell.
-                    Alternatively, if you choose the keyboard, move around the selected cell with the arrow keys and press 'Enter' or 'Space' key when you spot a matching one."}</p>
-                <p>{"You can start playing by pressing the 'S' or 'Enter' key or the button "}
+                    Alternatively, if you choose the keyboard, move around the selected cell with the arrow keys and press 'Enter' or the 'Space' key when you spot a matching one."}</p>
+                <p>{"You can start playing by pressing the 'S' or 'Enter' key or button "}
                     <span><img class="icon__img" src="/images/start_icon.svg" alt="start_game" /></span>
-                    {". During gameplay, you can make use of eight helps by pressing the 'H' key or the button "}
+                    {". During gameplay, you can make use of eight helps by pressing the 'H' key or button "}
                     <span><img class="icon__img" src="/images/match_icon.svg" alt="show_matches" /></span>
                     {", which highlights up to eight matches to assist you in spotting them on time."}</p>
                 <p>{"There are currently two levels at play: Level 1 is a multi-core binary representation of the network core usage.
@@ -1076,7 +1076,7 @@ impl App {
                 {" and you will be prompt to connnect an Asset Hub account and sign the transaction to mint the results. This account will be entitled to a soulbound NFT and it will hold your results history."}</p>
                 <h6>{"What comes next?"}</h6>
                 <p>{"Corematch patterns will evolve into beautiful, colorful, core compositions, alongside Polkadot evolution. Explore more about Polkadot direction "}<a class="link" href="https://wiki.polkadot.network/docs/polkadot-direction#agile-composable-computer" target="_blank">{"here"}</a>{"."}</p>
-                <p>{"If you've read this far, we hope you enjoy our work and may it serve as inspiration for fellow tinkerers out there."}</p>
+                <p>{"If you've read this far, we hope you enjoy our work and may it serve as inspiration for fellow tinkerers and builders out there."}</p>
                 <p>{"Play on repeat, have fun and enjoy ✌️"}<br/>{"Paulo // Turboflakes"}</p>
             </div>
         }

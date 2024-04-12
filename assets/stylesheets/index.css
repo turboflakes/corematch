@@ -1,8 +1,3 @@
-body {
-    margin: 0;
-    padding: 0;
-}
-
 .container {
     margin: 0 auto;
     display: flex;
@@ -14,11 +9,11 @@ body {
 
 .container.polkadot {
     /* background: radial-gradient(hsla(210, 17%, 98%, 1) 0%, hsla(341, 91%, 68%, 1) 100%); */
-    background: linear-gradient(180deg, hsla(210, 17%, 98%, 1), hsla(341, 91%, 68%, 1));
+    background: linear-gradient(180deg, hsla(210, 17%, 98%, 1), hsla(341, 91%, 68%, 0.1));
 }
 .container.kusama {
     /* background: radial-gradient(hsla(210, 17%, 98%, 1) 0%, hsla(208, 7%, 46%, 1) 100%); */
-    background: linear-gradient(180deg, hsla(210, 17%, 98%, 1), hsla(208, 7%, 46%, 1));
+    background: linear-gradient(180deg, hsla(210, 17%, 98%, 1), hsla(210, 11%, 15%, 0.2));
 }
 
 .header {
@@ -47,7 +42,7 @@ footer {
 }
 
 footer .caption {
-    color: var(--color-base);
+    color: var(--color-primary);
     font-size: var(--font-size-x-small);
     line-height: 1.2;
 }
@@ -617,7 +612,7 @@ footer .caption {
 }
 
 .column__info > .box.is__on {
-    border: 1px solid var(--color-yellow);
+    border: 1px solid var(--color-yellow-lighter);
     background-color: var(--color-yellow-lighter);
 }
 
@@ -708,9 +703,6 @@ footer .caption {
         font-size: var(--font-size-xx-small);
     }
 
-    .btn__link > .label {
-        font-size: var(--font-size-small);
-    }
 }
 
 /* Larger than phablet (also point when grid becomes active) */
