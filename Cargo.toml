@@ -1,6 +1,6 @@
 [package]
 name = "corematch"
-version = "0.2.8"
+version = "0.3.0"
 license = "Apache-2.0"
 repository = "https://github.com/turboflakes/corematch"
 authors = ["Paulo <paulo@turboflakes.io>"]
@@ -8,7 +8,7 @@ description = "Corematch is a memory game where the player has to match the late
 edition = "2021"
 
 [dependencies]
-wasm-bindgen = "0.2.89"
+wasm-bindgen = "0.3.09"
 wasm-bindgen-futures = "0.4.39"
 wasm-logger = "0.2.0"
 yew = { version = "0.21", features = ["csr"] }
