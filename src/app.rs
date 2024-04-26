@@ -1,5 +1,5 @@
 use crate::account::{Account, AccountState, AccountStatus, SigningStatus};
-use crate::account_provider::AccountProvider;
+// use crate::account_provider::AccountProvider;
 use crate::block::{Block, BlockNumber, BlockView, Corespace};
 use crate::block_timer::BlockTimer;
 use crate::block_timer::_Props::visible;
@@ -13,6 +13,7 @@ use crate::keyboard::SupportedKeys;
 use crate::network::{
     generate_parachain_colors, NetworkState, NetworkStatus, ParachainColors, ParachainIds,
 };
+use crate::router::Query;
 use crate::runtimes::polkadot::node_runtime::runtime_apis::babe_api::types::GenerateKeyOwnershipProof;
 use crate::runtimes::support::{SupportedParachainRuntime, SupportedRelayRuntime};
 use crate::subscription_provider::{SubscriptionId, SubscriptionProvider};
@@ -33,6 +34,7 @@ use yew::{
     platform::time::sleep,
     AttrValue, Callback, Component, Context, ContextProvider, Html, NodeRef, Properties,
 };
+use yew_router::{prelude::LocationHandle, scope_ext::RouterScopeExt};
 
 const DEFAULT_INITIAL_POINTS: u32 = 0;
 const DEFAULT_BASE_POINTS: u32 = 4;
@@ -161,7 +163,7 @@ pub enum Msg {
     NetworkSubscriptionCreated(SubscriptionId),
     NetworkDataReceived((SubscriptionId, Block)),
     NetworkParachainsCollected(ParachainIds),
-    NetworkButtonClicked(AttrValue),
+    NetworkChanged,
     BlockClicked(usize),
     BlockPressed(usize),
     BlockMatched(usize),
@@ -209,6 +211,7 @@ pub struct App {
     keyboard_listener: Option<EventListener>,
     cursor_position: Position,
     timeout: Option<Timeout>,
+    _location_listener: LocationHandle,
 }
 
 impl Component for App {
@@ -216,8 +219,20 @@ impl Component for App {
     type Properties = ();
 
     fn create(ctx: &Context<Self>) -> Self {
-        // Set default runtime as Polkadot
-        let runtime = SupportedRelayRuntime::Polkadot;
+        // subscribe network from query params or default to polkadot
+        let location = ctx.link().location().unwrap();
+        let runtime = location
+            .query::<Query>()
+            .map(|it| it.chain)
+            .unwrap_or(SupportedRelayRuntime::Polkadot);
+
+        // listener to handle location changes
+        let location_listener = ctx
+            .link()
+            .add_location_listener(ctx.link().callback(move |_| Msg::NetworkChanged))
+            .unwrap();
+
+        // define network callbacks
         let runtime_callback = ctx.link().callback(Msg::NetworkDataReceived);
         let subscription_callback = ctx.link().callback(Msg::NetworkSubscriptionCreated);
         let parachains_callback = ctx.link().callback(Msg::NetworkParachainsCollected);
@@ -259,16 +274,23 @@ impl Component for App {
             keyboard_listener: None,
             cursor_position: (0, 0),
             timeout: None,
+            _location_listener: location_listener,
         }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            Msg::NetworkButtonClicked(network) => {
+            Msg::NetworkChanged => {
+                let location = ctx.link().location().unwrap();
+                let runtime = location
+                    .query::<Query>()
+                    .map(|it| it.chain)
+                    .unwrap_or(SupportedRelayRuntime::Polkadot);
                 if self.network_state.is_active() {
                     let network_state = Rc::make_mut(&mut self.network_state);
                     network_state.status = NetworkStatus::Switching;
-                    network_state.runtime = SupportedRelayRuntime::from(network);
+                    // network_state.runtime = SupportedRelayRuntime::from(network);
+                    network_state.runtime = runtime;
                     // NOTE: if network (relay) changes than account_state runtime (asset-hub) also changes
                     let account_state = Rc::make_mut(&mut self.account_state);
                     account_state.runtime = network_state.runtime.asset_hub_runtime();
@@ -797,13 +819,17 @@ impl App {
             Some("hidden")
         };
         html! {
-            <span class={classes!("score__info", visible_class)}>
-                <span>{"Points: "} <b>{format!("{} ", self.points)}</b></span>
-                <span>{"Duration: "} <b>{format!("{} ", self.duration)}</b></span>
-                <span>{"Attempts: "} <b>{format!("{} ", self.tries)}</b></span>
-                <span>{"Helps: "} <b>{format!("{} ", self.helps)}</b></span>
+            <div class={classes!("score__info", visible_class)}>
+                <div>
                 { self.block_countdown_view(link)}
-            </span>
+                </div>
+                <div>
+                    <span>{"POINTS: "} <b>{format!("{}", self.points)}</b></span>
+                    <span>{"DURATION: "} <b>{format!("{}", self.duration)}</b></span>
+                </div>
+                // <span>{"Attempts: "} <b>{format!("{}", self.tries)}</b></span>
+                // <span>{"Helps: "} <b>{format!("{}", self.helps)}</b></span>
+            </div>
         }
     }
 
@@ -834,15 +860,18 @@ impl App {
 
     fn block_countdown_view(&self, _link: &Scope<Self>) -> Html {
         // reset countdown every time a new block is added to the board
-        let block_number = if let Some(opt) = self.blocks.get(0) {
-            if let Some(block) = opt {
-                Some(block.block_number)
-            } else {
-                None
-            }
-        } else {
-            None
-        };
+        // let block_number = if let Some(opt) = self.blocks.get(0) {
+        //     if let Some(block) = opt {
+        //         Some(block.block_number)
+        //     } else {
+        //         None
+        //     }
+        // } else {
+        //     None
+        // };
+
+        let block_number = self.get_last_finalized_block_number();
+
         html! { <BlockTimer block_number={block_number.clone()} visible={self.is_game_on()} /> }
     }
 
@@ -1000,7 +1029,6 @@ impl App {
 
     fn subscription_icon_view(&self, link: &Scope<Self>) -> Html {
         let network_state = self.network_state.clone();
-        let network_onclick = link.callback(move |e| Msg::NetworkButtonClicked(e));
 
         let visible_class = if self.network_state.is_active() {
             Some("visible")
@@ -1012,12 +1040,12 @@ impl App {
             <SubscriptionProvider>
                 { match network_state.runtime {
                     SupportedRelayRuntime::Polkadot => html! {
-                        <NetworkButton switch_to="kusama" class={visible_class} onclick={network_onclick.clone()} >
+                        <NetworkButton switch_to_chain={SupportedRelayRuntime::Kusama} class={visible_class} >
                             <img class="icon__img" src="/images/kusama_icon.svg" alt="kusama logo" />
                         </NetworkButton>
                     },
                     SupportedRelayRuntime::Kusama => html! {
-                        <NetworkButton switch_to="polkadot" class={visible_class} onclick={network_onclick.clone()} >
+                        <NetworkButton switch_to_chain={SupportedRelayRuntime::Polkadot} class={visible_class} >
                             <img class="icon__img" src="/images/polkadot_icon_white.svg" alt="polkadot logo" />
                         </NetworkButton>
                     }
@@ -1039,11 +1067,11 @@ impl App {
         html! {
             <div class={classes!("game__about")}>
                 <h6>{"What is Corematch?"}</h6>
-                <p>{"Is an unstoppable memory game where players must spot a matching pattern to earn points. 
+                <p>{"Is an unstoppable memory game where players must spot a matching pattern to earn points.
                     The board game holds a maximum of sixteen square objects, organized in a 4x4 matrix named “"} <b><i>{"Cells"}</i></b>{"”."}
                 </p>
                 <h6>{"Where does the pattern come from?"}</h6>
-                <p>{"The pattern is crafted depending on the selected chain, and reflects the "} 
+                <p>{"The pattern is crafted depending on the selected chain, and reflects the "}
                 <a class="link" href="https://wiki.polkadot.network/docs/polkadot-direction#core-usage-in-polkadot-10" target="_blank">{"core usage"}</a>
                     {" of either Polkadot or Kusama multi-core protocol on every finalized block."}
                 </p>
@@ -1278,6 +1306,17 @@ impl App {
                 }
             }
         }
+    }
+
+    fn get_last_finalized_block_number(&self) -> Option<u32> {
+        if self.is_game_on() {
+            if let Some(opt) = self.blocks.get(0) {
+                if let Some(block) = opt {
+                    return Some(block.block_number);
+                }
+            }
+        }
+        None
     }
 
     fn move_cursor(&mut self, new_position: Position) {

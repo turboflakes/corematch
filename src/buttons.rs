@@ -1,5 +1,6 @@
 use crate::app::GameLevel;
 use crate::block::BlockView;
+use crate::router::{Query, Routes};
 use crate::runtimes::support::SupportedRelayRuntime;
 use gloo::timers::callback::Timeout;
 use log::info;
@@ -8,6 +9,7 @@ use yew::{
     Properties,
 };
 use yew_hooks::use_clipboard;
+use yew_router::prelude::use_navigator;
 
 #[derive(Properties, PartialEq)]
 pub struct ActionButtonProps {
@@ -113,20 +115,22 @@ pub fn button(props: &MintButtonProps) -> Html {
 
 #[derive(Properties, PartialEq)]
 pub struct NetworkButtonProps {
-    pub switch_to: AttrValue,
+    pub switch_to_chain: SupportedRelayRuntime,
     pub class: Option<AttrValue>,
     pub children: Children,
-    pub onclick: Callback<AttrValue>,
 }
 
 #[function_component(NetworkButton)]
 pub fn button(props: &NetworkButtonProps) -> Html {
     let optional_class = props.class.clone();
-    let switch_to = props.switch_to.clone();
+    let chain = props.switch_to_chain.clone();
+    let navigator = use_navigator().unwrap();
 
-    let onclick = props.onclick.reform(move |_| switch_to.clone());
-
-    let _label = format!("switch to {}", props.switch_to.clone());
+    let onclick = Callback::from(move |_| {
+        navigator
+            .push_with_query(&Routes::Index, &Query { chain })
+            .unwrap();
+    });
 
     html! {
         <button class={classes!("btn__icon", optional_class)} {onclick} >

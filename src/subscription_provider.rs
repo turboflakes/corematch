@@ -5,7 +5,7 @@ use anyhow::anyhow;
 use futures::FutureExt;
 use log::{error, info};
 use std::rc::Rc;
-use subxt::{OnlineClient, PolkadotConfig};
+use subxt::{lightclient::LightClient, OnlineClient, PolkadotConfig};
 use yew::{
     html, platform::pinned::mpsc::UnboundedSender, AttrValue, Callback, Children, Component,
     Context, ContextHandle, Html, Properties,
@@ -50,6 +50,15 @@ impl Component for SubscriptionProvider {
             .link()
             .context::<Rc<NetworkState>>(ctx.link().callback(Msg::ContextChanged))
             .expect("context to be set");
+
+        // TODO: test light client support
+        // let (lightclient, polkadot_rpc) = LightClient::relay_chain(POLKADOT_SPEC).unwrap();
+        // ctx.link().send_future(OnlineClient::<PolkadotConfig>::from_rpc_client(polkadot_rpc).map(|result| {
+        //     match result {
+        //         Ok(online_client) => Msg::OnlineClientCreated(online_client),
+        //         Err(err) => Msg::Error(anyhow!("RPC connection could not be established, make sure RPC endpoint is valid:\n{err}")),
+        //     }
+        // }));
 
         let runtime = SupportedRelayRuntime::from(state.runtime.clone());
         ctx.link().send_future(OnlineClient::<PolkadotConfig>::from_url(runtime.default_rpc_url()).map(|result| {
