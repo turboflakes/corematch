@@ -4,7 +4,9 @@ use crate::runtimes::support::SupportedRelayRuntime;
 use futures::StreamExt;
 use log::{error, info};
 use node_runtime::runtime_types::{
-    polkadot_parachain_primitives::primitives::Id, polkadot_primitives::v5::CoreOccupied,
+    polkadot_parachain_primitives::primitives::Id,
+    polkadot_runtime_parachains::scheduler::common::Assignment,
+    polkadot_runtime_parachains::scheduler::pallet::CoreOccupied,
 };
 use rand::Rng;
 use std::time::Duration;
@@ -136,9 +138,12 @@ pub async fn fetch_corespace(
             .enumerate()
             .map(|(i, core_occupied)| match core_occupied {
                 CoreOccupied::Free => Core::new(i, None),
-                CoreOccupied::Paras(paras_entry) => {
-                    let Id(para_id) = paras_entry.assignment.para_id;
-                    Core::new(i, Some(para_id))
+                CoreOccupied::Paras(paras_entry) => match &paras_entry.assignment {
+                    Assignment::Pool {
+                        para_id: Id(para_id),
+                        core_index: _,
+                    } => Core::new(i, Some(*para_id)),
+                    Assignment::Bulk(Id(para_id)) => Core::new(i, Some(*para_id)),
                 }
             })
             .collect::<Corespace>();
