@@ -73,8 +73,11 @@ impl Component for BlockTimer {
         } else {
             Some("hidden")
         };
+
         html! {
-            <span class={classes!("countdown", visible_class)}>{"Timer: "}<b>{format!(" {}.{}s", self.seconds, self.milliseconds)}</b></span>
+            <span class={classes!("countdown", visible_class)}>
+                <b>{format!("#{} / {}.{}s", ctx.props().block_number.unwrap_or(0),  self.seconds, self.milliseconds)}</b>
+            </span>
         }
     }
 }

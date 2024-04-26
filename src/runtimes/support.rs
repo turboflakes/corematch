@@ -1,8 +1,9 @@
+use serde::{Deserialize, Serialize};
 use yew::AttrValue;
 
 pub type ChainPrefix = u16;
 
-#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Deserialize, Serialize)]
 pub enum SupportedRelayRuntime {
     Polkadot,
     Kusama,
@@ -48,8 +49,10 @@ impl SupportedRelayRuntime {
 impl From<AttrValue> for SupportedRelayRuntime {
     fn from(v: AttrValue) -> Self {
         match v.as_str() {
+            "Polkadot" => Self::Polkadot,
             "polkadot" => Self::Polkadot,
             "DOT" => Self::Polkadot,
+            "Kusama" => Self::Kusama,
             "kusama" => Self::Kusama,
             "KSM" => Self::Kusama,
             _ => unimplemented!("Chain prefix not supported"),
@@ -60,8 +63,10 @@ impl From<AttrValue> for SupportedRelayRuntime {
 impl From<String> for SupportedRelayRuntime {
     fn from(v: String) -> Self {
         match v.as_str() {
+            "Polkadot" => Self::Polkadot,
             "polkadot" => Self::Polkadot,
             "DOT" => Self::Polkadot,
+            "Kusama" => Self::Kusama,
             "kusama" => Self::Kusama,
             "KSM" => Self::Kusama,
             _ => unimplemented!("Chain prefix not supported"),
