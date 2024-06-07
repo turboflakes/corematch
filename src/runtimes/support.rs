@@ -19,8 +19,8 @@ impl SupportedRelayRuntime {
 
     pub fn default_rpc_url(&self) -> String {
         match &self {
-            Self::Polkadot => "wss://rpc.turboflakes.io:443/polkadot".to_string(),
-            Self::Kusama => "rpc.turboflakes.io:443/kusama".to_string(),
+            Self::Polkadot => "wss://rpc.ibp.network:443/polkadot".to_string(),
+            Self::Kusama => "wss://rpc.ibp.network:443/kusama".to_string(),
         }
     }
 
