@@ -41,6 +41,7 @@ const DEFAULT_BASE_POINTS: u32 = 4;
 const DEFAULT_INITIAL_DURATION: u32 = 0;
 const DEFAULT_INITIAL_TRIES: u32 = 4;
 const DEFAULT_INITIAL_HELPS: u32 = 8;
+pub const DEFAULT_TOTAL_BLOCKS: u32 = 9;
 
 #[derive(Clone, PartialEq, Debug)]
 pub enum BoardStatus {
@@ -257,7 +258,7 @@ impl Component for App {
             board_status: BoardStatus::Game,
             previous_board_status: None,
             network_state,
-            blocks: vec![None; 16],
+            blocks: vec![None; DEFAULT_TOTAL_BLOCKS.try_into().unwrap()],
             match_position: None,
             match_counter: 0,
             matches: BTreeMap::new(),
@@ -330,7 +331,7 @@ impl Component for App {
                         .and_modify(|m| *m += 1)
                         .or_insert(1);
                     // oldest block gets removed
-                    if self.blocks.len() > 16 {
+                    if self.blocks.len() > DEFAULT_TOTAL_BLOCKS.try_into().unwrap() {
                         if let Some(opt) = self.blocks.pop() {
                             if let Some(block) = opt {
                                 let block_hash = block.corespace_hash(self.game_level.clone());
@@ -661,19 +662,19 @@ impl Component for App {
                         info!("Skip")
                     }
                     SupportedKeys::Up => match self.cursor_position.1 {
-                        0 => self.move_cursor((self.cursor_position.0, 3)),
+                        0 => self.move_cursor((self.cursor_position.0, 2)),
                         _ => self.move_cursor((self.cursor_position.0, self.cursor_position.1 - 1)),
                     },
                     SupportedKeys::Down => match self.cursor_position.1 {
-                        3 => self.move_cursor((self.cursor_position.0, 0)),
+                        2 => self.move_cursor((self.cursor_position.0, 0)),
                         _ => self.move_cursor((self.cursor_position.0, self.cursor_position.1 + 1)),
                     },
                     SupportedKeys::Left => match self.cursor_position.0 {
-                        0 => self.move_cursor((3, self.cursor_position.1)),
+                        0 => self.move_cursor((2, self.cursor_position.1)),
                         _ => self.move_cursor((self.cursor_position.0 - 1, self.cursor_position.1)),
                     },
                     SupportedKeys::Right => match self.cursor_position.0 {
-                        3 => self.move_cursor((0, self.cursor_position.1)),
+                        2 => self.move_cursor((0, self.cursor_position.1)),
                         _ => self.move_cursor((self.cursor_position.0 + 1, self.cursor_position.1)),
                     },
                     SupportedKeys::S => self.start(),
@@ -1068,7 +1069,7 @@ impl App {
             <div class={classes!("game__about")}>
                 <h6>{"What is Corematch?"}</h6>
                 <p>{"Is an unstoppable memory game where players must spot a matching pattern to earn points."}</p>
-                <p>{"The board game holds a maximum of sixteen square objects named —  "} <b><i>{"Cells"}</i></b>{" — organized in a 4x4 matrix."}</p>
+                <p>{"The board game holds a maximum of sixteen square objects named —  "} <b><i>{"Cells"}</i></b>{" — organized in a 3x3 matrix."}</p>
                 <h6>{"What are Cells?"}</h6>
                 <p>{"Cells in Corematch serves as a representation of the sharded execution system currently designed and active in Polkadot. It specifically highlights the "}
                     <a class="link" href="https://wiki.polkadot.network/docs/polkadot-direction#core-usage-in-polkadot-10" target="_blank">{"Core Usage"}</a>
@@ -1192,7 +1193,7 @@ impl App {
 
     fn full_reset(&mut self) {
         self.reset();
-        self.blocks = vec![None; 16];
+        self.blocks = vec![None; DEFAULT_TOTAL_BLOCKS.try_into().unwrap()];
     }
 
     fn reset(&mut self) {
@@ -1332,10 +1333,10 @@ impl App {
 
     fn incr_cursor_position(&mut self) {
         if self.is_game_on() {
-            self.cursor_position = if self.cursor_position.0 < 3 {
+            self.cursor_position = if self.cursor_position.0 < 2 {
                 (self.cursor_position.0 + 1, self.cursor_position.1)
             } else {
-                if self.cursor_position.1 < 3 {
+                if self.cursor_position.1 < 2 {
                     (0, self.cursor_position.1 + 1)
                 } else {
                     (0, 0)
@@ -1345,13 +1346,13 @@ impl App {
     }
 
     fn get_cursor_index(&self) -> usize {
-        (self.cursor_position.1 * 4 + self.cursor_position.0).into()
+        (self.cursor_position.1 * 3 + self.cursor_position.0).into()
     }
 
     fn set_cursor_position(&mut self, i: usize) {
         self.cursor_position = (
-            (i % 4).try_into().expect("usize with incorrect value"),
-            (i / 4).try_into().expect("usize with incorrect value"),
+            (i % 3).try_into().expect("usize with incorrect value"),
+            (i / 3).try_into().expect("usize with incorrect value"),
         );
     }
 

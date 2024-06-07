@@ -30,7 +30,7 @@ type NftsCall = node_runtime::runtime_types::pallet_nfts::pallet::Call;
 type NftId = u32;
 
 #[subxt::subxt(
-    runtime_metadata_path = "metadata/asset_hub_westend_metadata.scale",
+    runtime_metadata_path = "artifacts/metadata/asset_hub_westend_metadata.scale",
     derive_for_all_types = "PartialEq, Clone"
 )]
 pub mod node_runtime {}

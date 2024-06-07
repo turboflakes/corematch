@@ -58,8 +58,8 @@
     --content-size: calc(6rem + (4 * (4px + (12 * 10 * 1px))));
 
     /* matrix size */
-    --matrix-size: 4;
-    --polkadot-size: 7;
+    --matrix-size: 3;
+    --polkadot-size: 8;
     --kusama-size: 8;
 
     --gameboard-size: calc(85vw);

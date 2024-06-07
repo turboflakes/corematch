@@ -1,3 +1,4 @@
+use crate::app::DEFAULT_TOTAL_BLOCKS;
 use crate::block::{Block, Corespace};
 use crate::core::Core;
 use crate::runtimes::support::SupportedRelayRuntime;
@@ -19,14 +20,13 @@ use yew::{
 use crate::subscription_provider::{SubscriptionId, STOP_SIGNAL};
 
 #[subxt::subxt(
-    runtime_metadata_path = "metadata/polkadot_metadata.scale",
+    runtime_metadata_path = "artifacts/metadata/polkadot_metadata_small.scale",
     derive_for_all_types = "PartialEq, Clone"
 )]
 pub mod node_runtime {}
 
 const SIX_SECS: Duration = Duration::from_secs(6);
-const DEFAULT_TOTAL_BLOCKS: u32 = 16;
-const DEFAULT_TOTAL_CORES: u32 = 49;
+const DEFAULT_TOTAL_CORES: u32 = 64;
 
 /// subscribes to finalized blocks, when a block is received, fetch storage for the block hash and send it via the callback.
 pub async fn subscribe_to_finalized_blocks(
@@ -144,7 +144,7 @@ pub async fn fetch_corespace(
                         core_index: _,
                     } => Core::new(i, Some(*para_id)),
                     Assignment::Bulk(Id(para_id)) => Core::new(i, Some(*para_id)),
-                }
+                },
             })
             .collect::<Corespace>();
 

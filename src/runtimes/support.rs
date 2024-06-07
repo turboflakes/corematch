@@ -19,14 +19,14 @@ impl SupportedRelayRuntime {
 
     pub fn default_rpc_url(&self) -> String {
         match &self {
-            Self::Polkadot => "wss://rpc.ibp.network/polkadot".to_string(),
-            Self::Kusama => "wss://rpc.ibp.network/kusama".to_string(),
+            Self::Polkadot => "wss://rpc.turboflakes.io:443/polkadot".to_string(),
+            Self::Kusama => "rpc.turboflakes.io:443/kusama".to_string(),
         }
     }
 
     pub fn columns_size(&self) -> u32 {
         match &self {
-            Self::Polkadot => 7,
+            Self::Polkadot => 8,
             Self::Kusama => 8,
         }
     }
