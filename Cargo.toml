@@ -1,6 +1,6 @@
 [package]
 name = "corematch"
-version = "0.3.0"
+version = "0.4.0"
 license = "Apache-2.0"
 repository = "https://github.com/turboflakes/corematch"
 authors = ["Paulo <paulo@turboflakes.io>"]
@@ -13,7 +13,7 @@ wasm-bindgen-futures = "0.4.39"
 wasm-logger = "0.2.0"
 yew = { version = "0.21", features = ["csr"] }
 yew-router = "0.18"
-yew-hooks = "0.3.0"
+yew-hooks = "0.4.0"
 subxt = { version = "0.35", default-features = false, features = ["unstable-light-client", "jsonrpsee", "web"], target_arch = "wasm32" }
 sp-core-hashing = "12.0.0"
 futures = "0.3.28"
