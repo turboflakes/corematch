@@ -1069,12 +1069,12 @@ impl App {
             <div class={classes!("game__about")}>
                 <h6>{"What is Corematch?"}</h6>
                 <p>{"Is an unstoppable memory game where players must spot a matching pattern to earn points."}</p>
-                <p>{"The board game holds a maximum of sixteen square objects named —  "} <b><i>{"Cells"}</i></b>{" — organized in a 3x3 matrix."}</p>
+                <p>{"The board game holds a maximum of nine square objects named —  "} <b><i>{"Cells"}</i></b>{" — organized in a 3x3 matrix."}</p>
                 <h6>{"What are Cells?"}</h6>
                 <p>{"Cells in Corematch serves as a representation of the sharded execution system currently designed and active in Polkadot. It specifically highlights the "}
                     <a class="link" href="https://wiki.polkadot.network/docs/polkadot-direction#core-usage-in-polkadot-10" target="_blank">{"Core Usage"}</a>
                     {" of either Polkadot or Kusama multi-core protocol."}</p>
-                <p>{"On Polkadot, at each finalized block, a pattern is crafted from the top 49 cores available on-chain (on Kusama the top 64 cores are used) and embedded within its own Cell. Each core is color-coded based on its usage.
+                <p>{"On Polkadot, at each finalized block, a pattern is crafted from all cores available on-chain (on Kusama the top 64 cores are used) and embedded within its own Cell. Each core is color-coded based on its usage.
                     In the current version, a single core can only exist in two states: empty or full."}</p>
                 <h6>{"What are the game rules?"}</h6>
                 <p>{"The mission is to earn as many points as possible by spotting one or more matches between the first selected Cell and the others in 6 seconds.
