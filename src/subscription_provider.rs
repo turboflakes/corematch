@@ -93,7 +93,7 @@ impl Component for SubscriptionProvider {
                 match self.state.runtime {
                     SupportedRelayRuntime::Polkadot => {
                         ctx.link()
-                            .send_future(polkadot::fetch_parachains(api).map(
+                            .send_future(polkadot::fetch_para_ids(api).map(
                                 |result| match result {
                                     Ok(para_ids) => Msg::ParachainsCollected(para_ids),
                                     Err(err) => Msg::Error(err.into()),
@@ -102,7 +102,7 @@ impl Component for SubscriptionProvider {
                     }
                     SupportedRelayRuntime::Kusama => {
                         ctx.link()
-                            .send_future(kusama::fetch_parachains(api).map(|result| match result {
+                            .send_future(kusama::fetch_para_ids(api).map(|result| match result {
                                 Ok(para_ids) => Msg::ParachainsCollected(para_ids),
                                 Err(err) => Msg::Error(err.into()),
                             }))

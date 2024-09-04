@@ -1,7 +1,7 @@
 use crate::app::DEFAULT_TOTAL_BLOCKS;
 use crate::block::{Block, Corespace};
 use crate::core::Core;
-use crate::runtimes::support::SupportedRelayRuntime;
+use crate::runtimes::{support::SupportedRelayRuntime, utils::get_para_id_from_storage_key};
 use futures::StreamExt;
 use log::{error, info};
 use node_runtime::runtime_types::{
@@ -26,7 +26,7 @@ use crate::subscription_provider::{SubscriptionId, STOP_SIGNAL};
 pub mod node_runtime {}
 
 const SIX_SECS: Duration = Duration::from_secs(6);
-const DEFAULT_TOTAL_CORES: u32 = 64;
+const DEFAULT_TOTAL_CORES: u32 = 36;
 
 /// subscribes to finalized blocks, when a block is received, fetch storage for the block hash and send it via the callback.
 pub async fn subscribe_to_finalized_blocks(
@@ -160,23 +160,14 @@ pub async fn fetch_corespace(
     Err(format!("Failed to fetch availability_cores for block_hash: {block_hash}").into())
 }
 
-pub async fn fetch_parachains(api: OnlineClient<PolkadotConfig>) -> Result<Vec<u32>, subxt::Error> {
-    let parachains_addr = node_runtime::storage().paras().parachains();
+pub async fn fetch_para_ids(api: OnlineClient<PolkadotConfig>) -> Result<Vec<u32>, subxt::Error> {
+    let mut para_ids: Vec<u32> = Vec::new();
+    let address = node_runtime::storage().paras().para_lifecycles_iter();
+    let mut iter = api.storage().at_latest().await?.iter(address).await?;
 
-    if let Some(parachains) = api
-        .storage()
-        .at_latest()
-        .await?
-        .fetch(&parachains_addr)
-        .await?
-    {
-        return Ok(parachains
-            .iter()
-            .map(|id| {
-                let Id(para_id) = id;
-                *para_id
-            })
-            .collect::<Vec<u32>>());
+    while let Some(Ok(storage)) = iter.next().await {
+        para_ids.push(get_para_id_from_storage_key(storage.key_bytes));
     }
-    Err(format!("Failed to fetch parachains").into())
+    para_ids.sort();
+    Ok(para_ids)
 }
