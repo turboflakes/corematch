@@ -1,8 +1,4 @@
-use log::info;
-use yew::{
-    classes, function_component, html, use_state, AttrValue, Callback, Children, FocusEvent, Html,
-    Properties,
-};
+use yew::{classes, function_component, html, AttrValue, Html, Properties};
 
 #[derive(Properties, PartialEq)]
 pub struct ColumnInfoProps {
@@ -22,10 +18,10 @@ pub fn view(props: &ColumnInfoProps) -> Html {
     let mut attempts = Vec::new();
     let available = props.value.clone();
     let gone = props.max.clone() - props.value.clone();
-    for i in 0..available {
+    for _i in 0..available {
         attempts.push(true);
     }
-    for i in 0..gone {
+    for _i in 0..gone {
         attempts.push(false);
     }
 

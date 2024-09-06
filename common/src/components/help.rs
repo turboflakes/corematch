@@ -1,4 +1,4 @@
-use yew::{classes, function_component, html, AttrValue, Callback, Html, Properties};
+use yew::{classes, function_component, html, Callback, Html, Properties};
 
 #[derive(Properties, PartialEq)]
 pub struct Props {

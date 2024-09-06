@@ -1,38 +1,29 @@
 use crate::components::buttons::NetworkButton;
 use crate::components::subscription_provider::SubscriptionProvider;
 use crate::router::Query;
-use corematch_common::components::block::{Block, BlockNumber, BlockView, Corespace};
+use corematch_common::components::block::{Block, BlockNumber};
 use corematch_common::components::block_timer::BlockTimer;
-use corematch_common::components::block_timer::_Props::visible;
-use corematch_common::components::buttons::_LevelProps::level;
 use corematch_common::components::buttons::{
-    ActionButton, BlockViewButton, IconButton, LevelButton, MintButton, ShareButton, TextButton,
+    ActionButton, IconButton, LevelButton, MintButton, ShareButton,
 };
-use corematch_common::components::core::{Core, CoreView};
 use corematch_common::components::keyboard::SupportedKeys;
 use corematch_common::components::views::ColumnInfoView;
 use corematch_common::runtimes::support::SupportedRelayRuntime;
-use corematch_common::types::account::{Account, AccountState, AccountStatus, SigningStatus};
+use corematch_common::types::account::{Account, SigningStatus};
 use corematch_common::types::game::{BoardStatus, GameHelpStatus, GameLevel, GameStatus};
 use corematch_common::types::network::{
-    generate_parachain_colors, NetworkState, NetworkStatus, ParachainColors, ParachainIds,
-    SubscriptionId,
+    generate_parachain_colors, NetworkState, NetworkStatus, ParachainIds, SubscriptionId,
 };
-use futures::executor::block_on;
 use gloo::events::EventListener;
 use gloo::timers::callback::Timeout;
-use log::{debug, info};
-use std::{collections::BTreeMap, rc::Rc, time::Duration};
+use log::info;
+use std::{collections::BTreeMap, rc::Rc};
 use subxt::utils::H256;
 use wasm_bindgen::{JsCast, UnwrapThrowExt};
-use web_sys::{window, HtmlElement};
+use web_sys::window;
 use yew::{
-    classes,
-    events::{FocusEvent, KeyboardEvent},
-    function_component, html,
-    html::Scope,
-    platform::time::sleep,
-    AttrValue, Callback, Component, Context, ContextProvider, Html, NodeRef, Properties,
+    classes, events::KeyboardEvent, html, html::Scope, AttrValue, Component, Context,
+    ContextProvider, Html,
 };
 use yew_router::{prelude::LocationHandle, scope_ext::RouterScopeExt};
 
@@ -667,13 +658,13 @@ impl App {
         }
     }
 
-    fn accounts_status_view(&self, msg: &str) -> Html {
-        html! {
-            <div class="status__msg">
-                <h4>{msg}</h4>
-            </div>
-        }
-    }
+    // fn accounts_status_view(&self, msg: &str) -> Html {
+    //     html! {
+    //         <div class="status__msg">
+    //             <h4>{msg}</h4>
+    //         </div>
+    //     }
+    // }
 
     // fn list_accounts_view(&self, accounts: Vec<Account>, link: &Scope<Self>) -> Html {
     //     html! {
@@ -724,7 +715,7 @@ impl App {
         }
     }
 
-    fn keyboard_view(&self, link: &Scope<Self>) -> Html {
+    fn keyboard_view(&self, _link: &Scope<Self>) -> Html {
         if self.is_game_on() {
             html! {
                 <span class={classes!("keyboard__info", "visible")}>
@@ -787,7 +778,7 @@ impl App {
         class={visible_class} position_class={Some("left")} {box_class} /> }
     }
 
-    fn helps_column_view(&self, link: &Scope<Self>) -> Html {
+    fn helps_column_view(&self, _link: &Scope<Self>) -> Html {
         let visible_class = if self.is_game_on() {
             Some("visible")
         } else {
@@ -881,11 +872,11 @@ impl App {
         }
     }
 
-    fn head_right_view(&self, link: &Scope<Self>) -> Html {
-        html! { self.game_stats_view(link) }
-    }
+    // fn head_right_view(&self, link: &Scope<Self>) -> Html {
+    //     html! { self.game_stats_view(link) }
+    // }
 
-    fn left_top_view(&self, link: &Scope<Self>) -> Html {
+    fn left_top_view(&self, _link: &Scope<Self>) -> Html {
         html! {
             <div class="top">
                 {
@@ -918,7 +909,7 @@ impl App {
         }
     }
 
-    fn subscription_icon_view(&self, link: &Scope<Self>) -> Html {
+    fn subscription_icon_view(&self, _link: &Scope<Self>) -> Html {
         let network_state = self.network_state.clone();
 
         let visible_class = if self.network_state.is_active() {
@@ -954,7 +945,7 @@ impl App {
         }
     }
 
-    fn about_view(&self, link: &Scope<Self>) -> Html {
+    fn about_view(&self, _link: &Scope<Self>) -> Html {
         html! {
             <div class={classes!("game__about")}>
                 <h6>{"What is Corematch?"}</h6>
@@ -999,7 +990,7 @@ impl App {
         }
     }
 
-    fn game_stats_view(&self, link: &Scope<Self>) -> Html {
+    fn game_stats_view(&self, _link: &Scope<Self>) -> Html {
         html! {
             <table class="game__stats">
                 <tr>
@@ -1050,7 +1041,7 @@ impl App {
         }
     }
 
-    fn game_message_view(&self, link: &Scope<Self>) -> Html {
+    fn game_message_view(&self, _link: &Scope<Self>) -> Html {
         html! {
             <th class="message">
                 { if self.is_game_on() { html! { <div class="game-on">{"It's ON!"}</div> } }

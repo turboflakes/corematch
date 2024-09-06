@@ -1,5 +1,3 @@
-use log::{debug, info};
-
 #[derive(Debug, Clone, PartialEq)]
 pub enum SupportedKeys {
     // Arrow keys -> Move the cursor in the matrix

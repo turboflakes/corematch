@@ -1,7 +1,7 @@
 use crate::router::Routes;
 use corematch_common::components::buttons::ActionButton;
 use yew::{html, Callback, Component, Context, Html};
-use yew_router::{prelude::use_navigator, scope_ext::RouterScopeExt};
+use yew_router::scope_ext::RouterScopeExt;
 
 pub struct PageNotFound;
 

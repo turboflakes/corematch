@@ -1,20 +1,13 @@
-use crate::components::block::Block;
 use crate::runtimes::support::SupportedParachainRuntime;
 use js_sys::Promise;
-use log::{error, info};
 use serde::{Deserialize, Serialize};
-use subxt::utils::AccountId32;
 use subxt::{
     ext::codec::{Compact, Encode},
-    utils::H256,
     OnlineClient, PolkadotConfig,
 };
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen_futures::JsFuture;
-use yew::{
-    classes, function_component, html, use_state, AttrValue, Callback, Component, Context,
-    ContextProvider, Html, MouseEvent, Properties, ToHtml,
-};
+use yew::{classes, function_component, html, AttrValue, Callback, Html, Properties};
 
 use anyhow::anyhow;
 use serde_json::json;

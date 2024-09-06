@@ -1,6 +1,5 @@
 use crate::components::block::Block;
 use crate::runtimes::support::SupportedRelayRuntime;
-use log::info;
 use rand::Rng;
 use std::collections::BTreeMap;
 use yew::Callback;

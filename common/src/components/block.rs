@@ -3,13 +3,8 @@ use crate::{
     components::core::{Core, CoreView, NaCoreComponent},
     runtimes::support::SupportedRelayRuntime,
 };
-use log::{error, info};
-use std::str::FromStr;
 use subxt::utils::H256;
-use yew::{
-    classes, function_component, html, use_state, AttrValue, Callback, Component, Context,
-    ContextProvider, Html, MouseEvent, Properties, ToHtml,
-};
+use yew::{classes, function_component, html, Callback, Html, Properties, ToHtml};
 
 pub type Corespace = Vec<Core>;
 pub type Index = usize;

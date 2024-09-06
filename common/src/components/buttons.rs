@@ -1,14 +1,10 @@
 use crate::components::block::BlockView;
-use crate::runtimes::support::SupportedRelayRuntime;
 use crate::types::game::GameLevel;
 use gloo::timers::callback::Timeout;
-use log::info;
 use yew::{
-    classes, function_component, html, use_state, AttrValue, Callback, Children, FocusEvent, Html,
-    Properties,
+    classes, function_component, html, use_state, AttrValue, Callback, Children, Html, Properties,
 };
 use yew_hooks::use_clipboard;
-use yew_router::prelude::use_navigator;
 
 #[derive(Properties, PartialEq)]
 pub struct ActionButtonProps {

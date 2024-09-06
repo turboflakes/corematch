@@ -1,12 +1,6 @@
 use crate::router::{Query, Routes};
 use corematch_common::runtimes::support::SupportedRelayRuntime;
-use gloo::timers::callback::Timeout;
-use log::info;
-use yew::{
-    classes, function_component, html, use_state, AttrValue, Callback, Children, FocusEvent, Html,
-    Properties,
-};
-use yew_hooks::use_clipboard;
+use yew::{classes, function_component, html, AttrValue, Callback, Children, Html, Properties};
 use yew_router::prelude::use_navigator;
 
 #[derive(Properties, PartialEq)]

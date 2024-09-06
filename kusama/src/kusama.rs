@@ -6,10 +6,11 @@ use corematch_common::runtimes::{
 };
 
 use futures::StreamExt;
-use log::{error, info};
+use log::error;
 use node_runtime::runtime_types::{
     polkadot_parachain_primitives::primitives::Id,
-    polkadot_runtime_parachains::scheduler::{common::Assignment, pallet::CoreOccupied},
+    polkadot_runtime_parachains::scheduler::common::Assignment,
+    polkadot_runtime_parachains::scheduler::pallet::CoreOccupied,
 };
 use rand::Rng;
 use std::time::Duration;
@@ -35,7 +36,7 @@ const DEFAULT_TOTAL_BLOCKS: u32 = 9;
 pub async fn subscribe_to_finalized_blocks(
     api: OnlineClient<PolkadotConfig>,
     cb: Callback<(SubscriptionId, Block)>,
-) -> Result<(SubscriptionId, UnboundedSender<AttrValue>), subxt::Error> {
+) -> Result<(SubscriptionId, UnboundedSender<AttrValue>), CorematchError> {
     // Create channel so that an unsubscribe signal could be received.
     let (tx, mut rx) = yew::platform::pinned::mpsc::unbounded::<AttrValue>();
     // Generate a unique subscription_id
@@ -123,7 +124,7 @@ pub async fn fetch_corespace(
     api: &OnlineClient<PolkadotConfig>,
     block_number: u32,
     block_hash: H256,
-) -> Result<Block, subxt::Error> {
+) -> Result<Block, CorematchError> {
     // Fetch availability_cores
     let availability_cores_addr = node_runtime::storage()
         .para_scheduler()
@@ -160,10 +161,12 @@ pub async fn fetch_corespace(
             SupportedRelayRuntime::Kusama,
         ));
     }
-    Err(format!("Failed to fetch availability_cores for block_hash: {block_hash}").into())
+    Err(CorematchError::Other(
+        format!("Failed to fetch availability_cores for block_hash: {block_hash}").into(),
+    ))
 }
 
-pub async fn fetch_para_ids(api: OnlineClient<PolkadotConfig>) -> Result<Vec<u32>, subxt::Error> {
+pub async fn fetch_para_ids(api: OnlineClient<PolkadotConfig>) -> Result<Vec<u32>, CorematchError> {
     let mut para_ids: Vec<u32> = Vec::new();
     let address = node_runtime::storage().paras().para_lifecycles_iter();
     let mut iter = api.storage().at_latest().await?.iter(address).await?;

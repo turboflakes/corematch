@@ -1,5 +1,5 @@
 use crate::types::network::{ParaId, ParachainColors};
-use yew::{classes, function_component, html, AttrValue, Callback, Html, Properties};
+use yew::{classes, function_component, html, Html, Properties};
 pub type Index = usize;
 
 #[derive(Clone, PartialEq)]

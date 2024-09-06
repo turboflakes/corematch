@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use corematch_common::components::block::{Block, Corespace};
+use corematch_common::components::block::Block;
 use corematch_common::runtimes::support::SupportedRelayRuntime;
 use corematch_common::types::network::{
     NetworkState, ParachainIds, SubscriptionId, CONTINUE_SIGNAL, STOP_SIGNAL,
@@ -7,7 +7,7 @@ use corematch_common::types::network::{
 use futures::FutureExt;
 use log::{error, info};
 use std::rc::Rc;
-use subxt::{lightclient::LightClient, OnlineClient, PolkadotConfig};
+use subxt::{OnlineClient, PolkadotConfig};
 use yew::{
     html, platform::pinned::mpsc::UnboundedSender, AttrValue, Callback, Children, Component,
     Context, ContextHandle, Html, Properties,
@@ -102,7 +102,7 @@ impl Component for SubscriptionProvider {
                             Err(err) => Msg::Error(err.into()),
                         }),
                     ),
-                    _ => unimplemented!(),
+                    // _ => unimplemented!(),
                 }
 
                 // Subscribe blocks
@@ -137,8 +137,7 @@ impl Component for SubscriptionProvider {
                                     Err(err) => Msg::Error(err.into()),
                                 },
                             ))
-                    }
-                    _ => unimplemented!(),
+                    } // _ => unimplemented!(),
                 };
                 true
             }
