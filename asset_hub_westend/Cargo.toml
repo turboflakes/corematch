@@ -1,0 +1,16 @@
+[package]
+name = "corematch-polkadot"
+version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+description.workspace = true
+edition.workspace = true
+
+[dependencies]
+subxt = { workspace = true }
+log = { workspace = true }
+rand = { workspace = true }
+futures = { workspace = true }
+yew = { workspace = true }
+corematch-common = { path = "../common" }

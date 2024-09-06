@@ -1,0 +1,30 @@
+[package]
+name = "corematch-common"
+version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+description.workspace = true
+edition.workspace = true
+
+[dependencies]
+wasm-bindgen = { workspace = true }
+wasm-bindgen-futures = { workspace = true }
+wasm-logger = { workspace = true }
+yew = { workspace = true }
+yew-router = { workspace = true }
+yew-hooks = { workspace = true }
+subxt = { workspace = true }
+sp-core-hashing = { workspace = true }
+futures = { workspace = true }
+anyhow = { workspace = true }
+strum = { workspace = true }
+strum_macros = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+log = { workspace = true }
+rand = { workspace = true }
+hex = { workspace = true }
+js-sys = { workspace = true }
+gloo = { workspace = true }
