@@ -73,13 +73,13 @@
         var(--corespace-size) / var(--polkadot-size) - var(--corespace-size) /
             var(--polkadot-size) * 0.16
     );
-    --gap-polkadot: calc(var(--core-polkadot) * 0.12);
+    --gap-polkadot: calc(var(--core-polkadot) * 0.16);
     /* kusama */
     --core-kusama: calc(
         var(--corespace-size) / var(--kusama-size) - var(--corespace-size) /
             var(--kusama-size) * 0.16
     );
-    --gap-kusama: calc(var(--core-kusama) * 0.12);
+    --gap-kusama: calc(var(--core-kusama) * 0.16);
 
     /* typography */
     --font-size: calc(1em + 1vw);
