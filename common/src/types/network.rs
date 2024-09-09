@@ -13,7 +13,7 @@ pub type SubscriptionId = u32;
 pub const STOP_SIGNAL: &str = "stop";
 pub const CONTINUE_SIGNAL: &str = "continue";
 
-#[derive(Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum NetworkStatus {
     Initializing,
     Switching,
@@ -22,7 +22,7 @@ pub enum NetworkStatus {
 }
 
 /// NetworkState is a shared state between all components.
-#[derive(Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct NetworkState {
     /// The status of the network.
     pub status: NetworkStatus,

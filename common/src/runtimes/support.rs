@@ -71,7 +71,7 @@ impl SupportedRelayRuntime {
 
     pub fn columns_size(&self) -> u32 {
         match &self {
-            Self::Polkadot => 6,
+            Self::Polkadot => 7,
             Self::Kusama => 8,
         }
     }

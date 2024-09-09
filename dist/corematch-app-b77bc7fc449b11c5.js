@@ -1254,7 +1254,7 @@ async function __wbg_init(module_or_path) {
     console.warn('using deprecated parameters for the initialization function; pass a single object instead')
 
     if (typeof module_or_path === 'undefined') {
-        module_or_path = new URL('corematch-app-daa7b4f10298c8b_bg.wasm', import.meta.url);
+        module_or_path = new URL('corematch-app-b77bc7fc449b11c5_bg.wasm', import.meta.url);
     }
     const imports = __wbg_get_imports();
 
