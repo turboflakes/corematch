@@ -1,7 +1,7 @@
 # corematch
 
 <p align="center">
-  <img src="https://github.com/turboflakes/corematch/blob/main/corematch_github_header.png?raw=true">
+  <img src="https://github.com/turboflakes/corematch/blob/main/gh_header.png?raw=true">
 </p>
 
 Corematch ― Unstopabble memory game where players match the latest Polkadot core usage in a 3x3 matrix board. Corematch is written in Rust and compiled to WASM to run entirely in the browser ([Subxt](https://github.com/paritytech/subxt) + [Yew](https://yew.rs/))
