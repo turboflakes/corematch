@@ -59,7 +59,7 @@
 
     /* matrix size */
     --matrix-size: 3;
-    --polkadot-size: 7;
+    --polkadot-size: 8;
     --kusama-size: 8;
 
     --gameboard-size: calc(85vw);

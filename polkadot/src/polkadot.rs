@@ -29,7 +29,7 @@ use corematch_common::types::network::{SubscriptionId, STOP_SIGNAL};
 pub mod node_runtime {}
 
 const SIX_SECS: Duration = Duration::from_secs(6);
-const DEFAULT_TOTAL_CORES: u32 = 49;
+const DEFAULT_TOTAL_CORES: u32 = 64;
 const DEFAULT_TOTAL_BLOCKS: u32 = 9;
 
 /// subscribes to finalized blocks, when a block is received, fetch storage for the block hash and send it via the callback.
