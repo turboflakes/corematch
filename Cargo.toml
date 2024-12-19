@@ -10,7 +10,7 @@ resolver = "2"
 
 [workspace.package]
 name = "corematch"
-version = "0.5.0"
+version = "0.6.0"
 license = "Apache-2.0"
 repository = "https://github.com/turboflakes/corematch"
 authors = ["Paulo <paulo@turboflakes.io>"]
