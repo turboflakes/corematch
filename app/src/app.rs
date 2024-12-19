@@ -1310,7 +1310,7 @@ impl App {
         let game_results = self.game_results().unwrap_or_default();
         if let Some(block) = &self.previous_match_block {
             let mut data = Vec::new();
-            data.push(format!("corematch.io {} 👀\n", game_results));
+            data.push(format!("corematch.xyz {} 👀\n", game_results));
             data.push(block.runtime.hashtag());
             Some(data.join("\n").into())
         } else {
